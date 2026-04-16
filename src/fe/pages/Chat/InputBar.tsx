@@ -15,7 +15,7 @@ export function InputBar({ value, onChange, onSend, onKeyDown, disabled }: Input
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={onKeyDown}
-          placeholder="Message ChatGPT"
+          placeholder="输入消息…"
           disabled={disabled}
           className="max-h-48 flex-1 resize-none bg-transparent px-3 py-2 text-[15px] leading-6 text-gray-900 outline-none placeholder:text-gray-500 disabled:opacity-50 dark:text-gray-100 dark:placeholder:text-gray-400"
         />
@@ -24,7 +24,7 @@ export function InputBar({ value, onChange, onSend, onKeyDown, disabled }: Input
           disabled={disabled || !value.trim()}
           className="rounded-full bg-[#202123] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-black disabled:cursor-not-allowed disabled:opacity-40 dark:bg-white dark:text-[#202123] dark:hover:bg-gray-200"
         >
-          Send
+          发送
         </button>
       </div>
     </div>

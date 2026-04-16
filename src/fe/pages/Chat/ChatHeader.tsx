@@ -9,7 +9,7 @@ export function ChatHeader({ onNewChat }: ChatHeaderProps) {
         onClick={onNewChat}
         className="rounded-lg px-3 py-1.5 text-sm text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-[#2f2f2f] dark:hover:text-gray-100"
       >
-        New Chat
+        新对话
       </button>
     </div>
   );

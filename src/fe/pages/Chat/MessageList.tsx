@@ -19,11 +19,8 @@ export function MessageList({ messages, loading }: MessageListProps) {
       {messages.length === 0 && (
         <div className="mt-24 text-center">
           <h1 className="text-3xl font-semibold tracking-tight text-gray-800 dark:text-gray-200">
-            What can I help with?
+            Hello World
           </h1>
-          <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">
-            Ask anything and press Enter to send
-          </p>
         </div>
       )}
       <div className="mx-auto w-full max-w-3xl space-y-6">
