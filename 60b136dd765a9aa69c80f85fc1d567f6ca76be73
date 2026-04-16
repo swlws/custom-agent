@@ -1,0 +1,61 @@
+src/be/session/index.ts
+  4048b5b89bf191ae 20-30,34
+src/be/persona/index.ts
+  4048b5b89bf191ae 1-45
+src/fe/pages/Chat/ChatHeader.tsx
+  4048b5b89bf191ae 3,7,20-38
+src/app/api/persona/route.ts
+  4048b5b89bf191ae 1-10
+src/fe/pages/Chat/PersonaPanel.tsx
+  4048b5b89bf191ae 1-94
+src/be/engine/index.ts
+  4048b5b89bf191ae 4,39-52
+src/fe/pages/Chat/index.tsx
+  4048b5b89bf191ae 3,8,12,16-20,29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "60b136dd765a9aa69c80f85fc1d567f6ca76be73",
+  "prompts": {
+    "4048b5b89bf191ae": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2f01fc25-1a60-4fd1-8d49-05fa94242635",
+        "model": "mcs-5"
+      },
+      "human_author": "swlws",
+      "messages": [],
+      "total_additions": 206,
+      "total_deletions": 9,
+      "accepted_lines": 206,
+      "overriden_lines": 0
+    },
+    "4fcb0012def368a2": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "e5cf74d6-a5de-4939-b15a-85f96ad82541",
+        "model": "default"
+      },
+      "human_author": "swlws",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 88,
+      "overriden_lines": 0
+    },
+    "c9a764f5b72da024": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "341e4a00-5e23-4c03-882e-56de740f3bfa",
+        "model": "mcs-5"
+      },
+      "human_author": "swlws",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    }
+  }
+}
