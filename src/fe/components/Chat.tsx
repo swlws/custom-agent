@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 
 import { connectChatSse, ChatMessage } from "@/fe/lib/chatSseClient";
+import MarkdownView from "@/fe/components/MarkdownView";
 
 export default function Chat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -95,13 +96,13 @@ export default function Chat() {
               }`}
             >
               <div
-                className={`whitespace-pre-wrap text-[15px] leading-7 ${
+                className={`break-words text-[15px] leading-7 ${
                   msg.role === "user"
                     ? "max-w-[85%] rounded-3xl bg-[#303030] px-5 py-3 text-white dark:bg-[#f4f4f4] dark:text-[#202123]"
                     : "w-full text-gray-900 dark:text-gray-100"
                 }`}
               >
-                {msg.content || (loading && i === messages.length - 1 ? "▋" : "")}
+                <MarkdownView content={msg.content || (loading && i === messages.length - 1 ? "▋" : "")} />
               </div>
             </div>
           ))}
