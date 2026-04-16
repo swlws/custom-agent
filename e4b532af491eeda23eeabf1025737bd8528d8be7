@@ -1,0 +1,51 @@
+src/fe/components/Chat/index.tsx
+  4048b5b89bf191ae 1-136
+src/fe/components/MarkdownView/index.tsx
+  4048b5b89bf191ae 1-247
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "e4b532af491eeda23eeabf1025737bd8528d8be7",
+  "prompts": {
+    "4048b5b89bf191ae": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2f01fc25-1a60-4fd1-8d49-05fa94242635",
+        "model": "mcs-5"
+      },
+      "human_author": "swlws",
+      "messages": [],
+      "total_additions": 383,
+      "total_deletions": 0,
+      "accepted_lines": 383,
+      "overriden_lines": 0
+    },
+    "4fcb0012def368a2": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "e5cf74d6-a5de-4939-b15a-85f96ad82541",
+        "model": "default"
+      },
+      "human_author": "swlws",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 88,
+      "overriden_lines": 0
+    },
+    "c9a764f5b72da024": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "341e4a00-5e23-4c03-882e-56de740f3bfa",
+        "model": "mcs-5"
+      },
+      "human_author": "swlws",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    }
+  }
+}
