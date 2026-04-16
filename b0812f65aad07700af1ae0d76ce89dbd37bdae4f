@@ -1,0 +1,38 @@
+src/fe/components/Chat.tsx
+  4fcb0012def368a2 6,99,105
+src/fe/components/MarkdownView.tsx
+  4fcb0012def368a2 1-248
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "b0812f65aad07700af1ae0d76ce89dbd37bdae4f",
+  "prompts": {
+    "4fcb0012def368a2": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "e5cf74d6-a5de-4939-b15a-85f96ad82541",
+        "model": "default"
+      },
+      "human_author": "swlws",
+      "messages": [],
+      "total_additions": 257,
+      "total_deletions": 8,
+      "accepted_lines": 339,
+      "overriden_lines": 0
+    },
+    "c9a764f5b72da024": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "341e4a00-5e23-4c03-882e-56de740f3bfa",
+        "model": "mcs-5"
+      },
+      "human_author": "swlws",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    }
+  }
+}
