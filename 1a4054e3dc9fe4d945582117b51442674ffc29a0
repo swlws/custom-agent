@@ -1,0 +1,57 @@
+public/file.svg
+  c9a764f5b72da024 1
+next.config.ts
+  c9a764f5b72da024 1-7
+src/app/page.tsx
+  c9a764f5b72da024 1-5
+src/app/layout.tsx
+  c9a764f5b72da024 1-34
+public/vercel.svg
+  c9a764f5b72da024 1
+public/window.svg
+  c9a764f5b72da024 1
+.gitignore
+  c9a764f5b72da024 1,3-11,13-14,16-18,20-21,23-25,27-31,33-34,36-37,39,41
+tsconfig.json
+  c9a764f5b72da024 1-17,19-34,37-41
+eslint.config.mjs
+  c9a764f5b72da024 1-16
+package.json
+  c9a764f5b72da024 1-28
+.claude/settings.local.json
+  c9a764f5b72da024 4-11
+public/globe.svg
+  c9a764f5b72da024 1
+src/lib/llm.ts
+  c9a764f5b72da024 1-77
+src/app/api/chat/route.ts
+  c9a764f5b72da024 1-36
+src/components/Chat.tsx
+  c9a764f5b72da024 1-123
+src/app/globals.css
+  c9a764f5b72da024 1-26
+postcss.config.mjs
+  c9a764f5b72da024 1-5
+public/next.svg
+  c9a764f5b72da024 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "1a4054e3dc9fe4d945582117b51442674ffc29a0",
+  "prompts": {
+    "c9a764f5b72da024": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "341e4a00-5e23-4c03-882e-56de740f3bfa",
+        "model": "mcs-5"
+      },
+      "human_author": "swlws",
+      "messages": [],
+      "total_additions": 576,
+      "total_deletions": 244,
+      "accepted_lines": 440,
+      "overriden_lines": 3
+    }
+  }
+}
