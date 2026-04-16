@@ -1,33 +1,26 @@
 import { NextRequest } from "next/server";
-import { createChatSseResponse, ChatMessage } from "@/be/services/chatSseService";
+import { createChatSseResponse } from "@/be/services/chatSseService";
 
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
-  const { messages } = (await req.json()) as { messages: ChatMessage[] };
+  const { uid, content } = (await req.json()) as { uid?: string; content: string };
 
-  if (!messages?.length) {
-    return new Response("messages is required", { status: 400 });
+  if (!content?.trim()) {
+    return new Response("content is required", { status: 400 });
   }
 
-  return createChatSseResponse(messages);
+  return createChatSseResponse(uid ?? "anonymous", content);
 }
 
 export async function GET(req: NextRequest) {
   const url = req.nextUrl;
-  const raw = url.searchParams.get("messages");
+  const uid = url.searchParams.get("uid") ?? "anonymous";
+  const content = url.searchParams.get("content");
 
-  if (!raw) {
-    return new Response("messages is required", { status: 400 });
+  if (!content?.trim()) {
+    return new Response("content is required", { status: 400 });
   }
 
-  try {
-    const messages = JSON.parse(raw) as ChatMessage[];
-    if (!Array.isArray(messages) || messages.length === 0) {
-      return new Response("messages is required", { status: 400 });
-    }
-    return createChatSseResponse(messages);
-  } catch {
-    return new Response("messages is invalid", { status: 400 });
-  }
+  return createChatSseResponse(uid, content);
 }

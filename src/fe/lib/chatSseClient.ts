@@ -1,23 +1,26 @@
 export type ChatMessage = { role: "user" | "assistant"; content: string };
 
 type ConnectChatSseParams = {
-  messages: ChatMessage[];
+  uid: string;
+  content: string;
   onToken: (token: string) => void;
   onDone?: () => void;
   onError?: (error: Error) => void;
 };
 
 /**
- * Connect to `/api/chat` SSE stream (GET + `messages` query param).
+ * Connect to `/api/chat` SSE stream.
+ * Only the current user message is sent; history is managed server-side.
  * The server sends `data: [DONE]` or `data: {"type":"token"|"error","content":...}`.
  */
 export function connectChatSse({
-  messages,
+  uid,
+  content,
   onToken,
   onDone,
   onError,
 }: ConnectChatSseParams): { close: () => void; eventSource: EventSource } {
-  const url = `/api/chat?messages=${encodeURIComponent(JSON.stringify(messages))}`;
+  const url = `/api/chat?uid=${encodeURIComponent(uid)}&content=${encodeURIComponent(content)}`;
   const es = new EventSource(url);
 
   let finished = false;
@@ -62,4 +65,3 @@ export function connectChatSse({
 
   return { close, eventSource: es };
 }
-

@@ -1,8 +1,8 @@
-import { chatStream, Message as LlmMessage } from "@/be/lib/llm";
+import { chatStream } from "@/be/lib/llm";
+import { buildContextMessages, updateSession } from "@/be/memory";
+import { loadSession, saveSession } from "@/be/session";
 
-export type ChatMessage = LlmMessage;
-
-function createSSEStream(messages: ChatMessage[]) {
+function createSSEStream(uid: string, content: string) {
   const encoder = new TextEncoder();
 
   const stream = new ReadableStream({
@@ -12,10 +12,21 @@ function createSSEStream(messages: ChatMessage[]) {
       };
 
       try {
-        for await (const chunk of chatStream(messages)) {
+        const session = await loadSession(uid);
+        const contextMessages = buildContextMessages(session, content);
+
+        let assistantReply = "";
+        for await (const chunk of chatStream(contextMessages)) {
+          assistantReply += chunk;
           sendEvent(JSON.stringify({ type: "token", content: chunk }));
         }
+
         sendEvent("[DONE]");
+
+        // Fire-and-forget: persist session without blocking the SSE response
+        updateSession(session, content, assistantReply)
+          .then((updated) => saveSession(uid, updated))
+          .catch((err) => console.error("[memory] failed to save session:", err));
       } catch (err) {
         const msg = err instanceof Error ? err.message : "Unknown error";
         sendEvent(JSON.stringify({ type: "error", content: msg }));
@@ -35,7 +46,6 @@ function createSSEStream(messages: ChatMessage[]) {
   });
 }
 
-export function createChatSseResponse(messages: ChatMessage[]) {
-  return createSSEStream(messages);
+export function createChatSseResponse(uid: string, content: string) {
+  return createSSEStream(uid, content);
 }
-

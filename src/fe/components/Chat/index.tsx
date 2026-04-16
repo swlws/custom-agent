@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 
 import { connectChatSse, ChatMessage } from "@/fe/lib/chatSseClient";
+import { getUid } from "@/fe/lib/uid";
 import MarkdownView from "@/fe/components/MarkdownView";
 
 export default function Chat() {
@@ -37,7 +38,8 @@ export default function Chat() {
     // 关闭上一次未完成的连接
     sseRef.current?.close();
     sseRef.current = connectChatSse({
-      messages: next,
+      uid: getUid(),
+      content: text,
       onToken: (token) => {
         setMessages((prev) => {
           const updated = [...prev];
