@@ -14,6 +14,12 @@ export function useChat() {
     };
   }, []);
 
+  async function loadHistory() {
+    const res = await fetch(`/api/memory?uid=${encodeURIComponent(getUid())}`);
+    const cached: ChatMessage[] = await res.json();
+    if (cached.length > 0) setMessages(cached);
+  }
+
   function newChat() {
     sseRef.current?.close();
     sseRef.current = null;
@@ -71,5 +77,5 @@ export function useChat() {
     }
   }
 
-  return { messages, input, setInput, loading, send, newChat, handleKeyDown };
+  return { messages, input, setInput, loading, send, newChat, loadHistory, handleKeyDown };
 }
