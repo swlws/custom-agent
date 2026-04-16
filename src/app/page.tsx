@@ -1,4 +1,4 @@
-import Chat from "@/fe/components/Chat";
+import Chat from "@/fe/pages/Chat";
 
 export default function Home() {
   return <Chat />;
