@@ -1,0 +1,46 @@
+src/be/memory/persona.ts
+  cac88ca785364c88 1-72
+src/be/engine/index.ts
+  cac88ca785364c88 2,32-36
+src/be/memory/memories.ts
+  cac88ca785364c88 1-70
+src/be/memory/messages.ts
+  cac88ca785364c88 1-55
+src/be/memory/mindcards.ts
+  cac88ca785364c88 1-78
+src/be/memory/index.ts
+  cac88ca785364c88 1-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "d6afaf0727b9f9791a7892c969f3462ed08b1952",
+  "prompts": {
+    "c9a764f5b72da024": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "341e4a00-5e23-4c03-882e-56de740f3bfa",
+        "model": "mcs-5"
+      },
+      "human_author": "swlws",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "cac88ca785364c88": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "371a97d3-9a9b-4010-84f7-537dc96a6290",
+        "model": "mcs-5"
+      },
+      "human_author": "swlws",
+      "messages": [],
+      "total_additions": 290,
+      "total_deletions": 147,
+      "accepted_lines": 289,
+      "overriden_lines": 0
+    }
+  }
+}
