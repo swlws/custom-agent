@@ -6,5 +6,9 @@ export const runtime = "nodejs";
 export async function GET(req: NextRequest) {
   const uid = req.nextUrl.searchParams.get("uid") ?? "anonymous";
   const session = await loadSession(uid);
-  return NextResponse.json(session.mindCards ?? []);
+  const all = session.mindCards ?? [];
+  if (all.length <= 4) return NextResponse.json(all);
+
+  const shuffled = [...all].sort(() => Math.random() - 0.5);
+  return NextResponse.json(shuffled.slice(0, 4));
 }

@@ -95,6 +95,11 @@ async function extractMemories(
   }
 }
 
+export interface UpdateSessionResult {
+  session: Session;
+  memoriesChanged: boolean;
+}
+
 /**
  * Append the new exchange, then compress overflow into typed memories when needed.
  */
@@ -102,7 +107,7 @@ export async function updateSession(
   session: Session,
   userContent: string,
   assistantContent: string,
-): Promise<Session> {
+): Promise<UpdateSessionResult> {
   const messages: ChatMessage[] = [
     ...session.messages,
     { role: "user", content: userContent },
@@ -110,12 +115,13 @@ export async function updateSession(
   ];
 
   if (messages.length <= KEEP_RECENT) {
-    return { ...session, messages };
+    return { session: { ...session, messages }, memoriesChanged: false };
   }
 
   const overflow = messages.slice(0, messages.length - KEEP_RECENT);
   const recent = messages.slice(-KEEP_RECENT);
   const memories = await extractMemories(session.memories, overflow);
 
-  return { ...session, memories, messages: recent };
+  const memoriesChanged = JSON.stringify(memories) !== JSON.stringify(session.memories);
+  return { session: { ...session, memories, messages: recent }, memoriesChanged };
 }

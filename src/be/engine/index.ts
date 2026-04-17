@@ -1,8 +1,8 @@
 import { chatStream } from "@/be/lib/llm";
 import { buildContextMessages, updateSession } from "@/be/memory";
 import { loadSession, saveSession } from "@/be/session";
-import { generatePersona } from "@/be/persona";
-import { generateMindCards } from "@/be/mindcards";
+import { refreshPersona } from "@/be/persona";
+import { refreshMindCards } from "@/be/mindcards";
 
 export interface QueryHandlers {
   onToken: (token: string) => void;
@@ -10,16 +10,6 @@ export interface QueryHandlers {
   onError: (error: Error) => void;
 }
 
-/**
- * QueryEngine orchestrates the full query lifecycle:
- *   1. Load session context
- *   2. Build LLM input via memory
- *   3. Stream response tokens via callbacks
- *   4. Persist session asynchronously (fire-and-forget)
- *
- * Callers (e.g. SSE service) only deal with transport concerns;
- * all business logic lives here.
- */
 export class QueryEngine {
   async run(uid: string, content: string, handlers: QueryHandlers): Promise<void> {
     const { onToken, onDone, onError } = handlers;
@@ -36,26 +26,14 @@ export class QueryEngine {
 
       onDone();
 
-      updateSession(session, content, assistantReply)
-        .then((updated) => {
-          const memoriesChanged =
-            JSON.stringify(updated.memories) !== JSON.stringify(session.memories);
-
-          if (memoriesChanged) {
-            return generatePersona(updated)
-              .then((persona) =>
-                generateMindCards(persona)
-                  .then((mindCards) => saveSession(uid, { ...updated, persona, mindCards }))
-                  .catch(() => saveSession(uid, { ...updated, persona }))
-              )
-              .catch((err) => {
-                console.error("[persona] failed to generate:", err);
-                return saveSession(uid, updated);
-              });
-          }
-          return saveSession(uid, updated);
-        })
-        .catch((err) => console.error("[memory] failed to save session:", err));
+      const { session: afterMemory, memoriesChanged } = await updateSession(
+        session,
+        content,
+        assistantReply,
+      );
+      const afterPersona = await refreshPersona(afterMemory, memoriesChanged);
+      const afterCards = await refreshMindCards(afterPersona);
+      await saveSession(uid, afterCards);
     } catch (err) {
       onError(err instanceof Error ? err : new Error("Unknown error"));
     }

@@ -52,3 +52,21 @@ export async function generatePersona(session: Session): Promise<Persona> {
 
   return { summary: "暂无画像", traits: [], updatedAt: new Date().toISOString() };
 }
+
+/**
+ * Refresh persona only when memories have changed.
+ * Returns updated session; leaves persona untouched when no refresh is needed.
+ */
+export async function refreshPersona(
+  session: Session,
+  memoriesChanged: boolean,
+): Promise<Session> {
+  if (!memoriesChanged) return session;
+  try {
+    const persona = await generatePersona(session);
+    return { ...session, persona };
+  } catch (err) {
+    console.error("[persona] failed to generate:", err);
+    return session;
+  }
+}

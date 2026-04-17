@@ -33,6 +33,7 @@ export interface Session {
   messages: ChatMessage[];
   persona?: Persona;
   mindCards?: MindCard[];
+  mindCardsUpdatedAt?: string;
 }
 
 export interface MindCard {
