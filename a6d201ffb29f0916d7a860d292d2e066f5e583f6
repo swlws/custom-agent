@@ -1,0 +1,38 @@
+src/be/memory/index.ts
+  cac88ca785364c88 99,101,105-114,116,122-123,125-127,130-131
+src/be/engine/index.ts
+  cac88ca785364c88 2,34-35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "a6d201ffb29f0916d7a860d292d2e066f5e583f6",
+  "prompts": {
+    "c9a764f5b72da024": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "341e4a00-5e23-4c03-882e-56de740f3bfa",
+        "model": "mcs-5"
+      },
+      "human_author": "swlws",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "cac88ca785364c88": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "371a97d3-9a9b-4010-84f7-537dc96a6290",
+        "model": "mcs-5"
+      },
+      "human_author": "swlws",
+      "messages": [],
+      "total_additions": 29,
+      "total_deletions": 23,
+      "accepted_lines": 31,
+      "overriden_lines": 0
+    }
+  }
+}
