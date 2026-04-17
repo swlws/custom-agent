@@ -1,0 +1,49 @@
+src/fe/pages/Chat/useChat.ts
+  92f688c892a3982c 88
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "dbbac22185d74e7474353f0f536fb678488b7868",
+  "prompts": {
+    "92f688c892a3982c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ca31b252-6356-4a0d-92b9-7cb3fba4a8d2",
+        "model": "mcs-5"
+      },
+      "human_author": "swlws",
+      "messages": [],
+      "total_additions": 1,
+      "total_deletions": 1,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "c9a764f5b72da024": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "341e4a00-5e23-4c03-882e-56de740f3bfa",
+        "model": "mcs-5"
+      },
+      "human_author": "swlws",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "cac88ca785364c88": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "371a97d3-9a9b-4010-84f7-537dc96a6290",
+        "model": "mcs-5"
+      },
+      "human_author": "swlws",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 152,
+      "overriden_lines": 0
+    }
+  }
+}
