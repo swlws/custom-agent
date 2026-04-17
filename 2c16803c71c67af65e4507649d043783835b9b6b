@@ -1,0 +1,36 @@
+src/fe/pages/Chat/MindCards.tsx
+  cac88ca785364c88 1,17,23-25,30-43,45-46,48-54,56
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "2c16803c71c67af65e4507649d043783835b9b6b",
+  "prompts": {
+    "c9a764f5b72da024": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "341e4a00-5e23-4c03-882e-56de740f3bfa",
+        "model": "mcs-5"
+      },
+      "human_author": "swlws",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "cac88ca785364c88": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "371a97d3-9a9b-4010-84f7-537dc96a6290",
+        "model": "mcs-5"
+      },
+      "human_author": "swlws",
+      "messages": [],
+      "total_additions": 30,
+      "total_deletions": 10,
+      "accepted_lines": 182,
+      "overriden_lines": 0
+    }
+  }
+}
