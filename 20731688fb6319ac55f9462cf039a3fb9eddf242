@@ -1,0 +1,65 @@
+src/be/engine/index.ts
+  cac88ca785364c88 14-19,27,43
+src/fe/lib/chatSseClient.ts
+  cac88ca785364c88 12,21,65
+src/fe/pages/Chat/index.tsx
+  cac88ca785364c88 11,26,29
+src/be/services/abortRegistry.ts
+  cac88ca785364c88 1-17
+src/fe/pages/Chat/useChat.ts
+  cac88ca785364c88 31-41,94
+src/be/lib/llm.ts
+  cac88ca785364c88 57,62-71
+src/be/services/chatSseService.ts
+  cac88ca785364c88 2,7,17-26,28
+src/fe/pages/Chat/InputBar.tsx
+  cac88ca785364c88 5,8,11,24-39
+src/app/api/chat/abort/route.ts
+  cac88ca785364c88 1-10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "20731688fb6319ac55f9462cf039a3fb9eddf242",
+  "prompts": {
+    "4fcb0012def368a2": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "e5cf74d6-a5de-4939-b15a-85f96ad82541",
+        "model": "default"
+      },
+      "human_author": "swlws",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 81,
+      "overriden_lines": 0
+    },
+    "c9a764f5b72da024": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "341e4a00-5e23-4c03-882e-56de740f3bfa",
+        "model": "mcs-5"
+      },
+      "human_author": "swlws",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "cac88ca785364c88": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "371a97d3-9a9b-4010-84f7-537dc96a6290",
+        "model": "mcs-5"
+      },
+      "human_author": "swlws",
+      "messages": [],
+      "total_additions": 231,
+      "total_deletions": 163,
+      "accepted_lines": 150,
+      "overriden_lines": 2
+    }
+  }
+}
