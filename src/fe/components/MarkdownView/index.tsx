@@ -1,7 +1,53 @@
 "use client";
 
+import { useState, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+
+function extractText(node: React.ReactNode): string {
+  if (typeof node === "string") return node;
+  if (typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(extractText).join("");
+  if (node !== null && typeof node === "object") {
+    const el = node as React.ReactElement<{ children?: React.ReactNode }>;
+    if ("props" in el) return extractText(el.props.children);
+  }
+  return "";
+}
+
+function CodeBlock({ children }: { children: React.ReactNode }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(() => {
+    const text = extractText(children);
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }, [children]);
+
+  return (
+    <pre className="group relative my-2 rounded-xl bg-[#0b0b0b] p-3 text-[13.5px] whitespace-pre-wrap break-words dark:bg-black [&>code]:bg-transparent [&>code]:text-gray-100 [&>code]:p-0">
+      <button
+        onClick={handleCopy}
+        title="复制代码"
+        className="absolute right-2 top-2 rounded-md p-1.5 text-gray-500 opacity-0 transition-all group-hover:opacity-100 hover:bg-white/10 hover:text-gray-200"
+      >
+        {copied ? (
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        ) : (
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" />
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+          </svg>
+        )}
+      </button>
+      {children}
+    </pre>
+  );
+}
 
 export default function MarkdownView({ content }: { content: string }) {
   return (
@@ -50,11 +96,7 @@ export default function MarkdownView({ content }: { content: string }) {
             {children}
           </td>
         ),
-        pre: ({ children }) => (
-          <pre className="my-2 rounded-xl bg-[#0b0b0b] p-3 text-[13.5px] whitespace-pre-wrap break-words dark:bg-black">
-            {children}
-          </pre>
-        ),
+        pre: ({ children }) => <CodeBlock>{children}</CodeBlock>,
       }}
     >
       {content}
