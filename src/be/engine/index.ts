@@ -1,8 +1,6 @@
 import { chatStream } from "@/be/lib/llm";
-import { buildContextMessages, updateSession, compactMemories } from "@/be/memory";
+import { buildContextMessages, appendMessages, compactMemories, refreshPersona, refreshMindCards } from "@/be/memory";
 import { loadSession, saveSession } from "@/be/session";
-import { refreshPersona } from "@/be/persona";
-import { refreshMindCards } from "@/be/mindcards";
 
 export interface QueryHandlers {
   onToken: (token: string) => void;
@@ -31,11 +29,11 @@ export class QueryEngine {
 
       onDone();
 
-      const afterMessages = updateSession(session, content, assistantReply);
-      const { session: afterMemory, memoriesChanged } = await compactMemories(afterMessages);
-      const afterPersona = await refreshPersona(afterMemory, memoriesChanged);
-      const afterCards = await refreshMindCards(afterPersona);
-      await saveSession(uid, afterCards);
+      const withMessages = appendMessages(session, content, assistantReply);
+      const { session: withMemory, memoriesChanged } = await compactMemories(withMessages);
+      const withPersona = await refreshPersona(withMemory, memoriesChanged);
+      const withCards = await refreshMindCards(withPersona);
+      await saveSession(uid, withCards);
     } catch (err) {
       if (err instanceof Error && err.name === "AbortError") return;
       onError(err instanceof Error ? err : new Error("Unknown error"));

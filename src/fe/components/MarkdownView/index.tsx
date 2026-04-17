@@ -31,7 +31,7 @@ export default function MarkdownView({ content }: { content: string }) {
           );
         },
         pre: ({ children }) => (
-          <pre className="my-2 rounded-xl bg-[#0b0b0b] p-3 text-[13.5px] text-gray-100 whitespace-pre-wrap break-words dark:bg-black">
+          <pre className="my-2 rounded-xl bg-[#0b0b0b] p-3 text-[13.5px] whitespace-pre-wrap break-words dark:bg-black">
             {children}
           </pre>
         ),
