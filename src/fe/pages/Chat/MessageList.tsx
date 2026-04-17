@@ -1,13 +1,15 @@
 import { useEffect, useRef } from "react";
 import { ChatMessage } from "@/fe/lib/chatSseClient";
 import { MessageItem } from "./MessageItem";
+import { MindCards } from "./MindCards";
 
 interface MessageListProps {
   messages: ChatMessage[];
   loading: boolean;
+  onCardSelect: (prompt: string) => void;
 }
 
-export function MessageList({ messages, loading }: MessageListProps) {
+export function MessageList({ messages, loading, onCardSelect }: MessageListProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -17,10 +19,11 @@ export function MessageList({ messages, loading }: MessageListProps) {
   return (
     <div className="flex-1 overflow-y-auto px-4 py-8 sm:px-6">
       {messages.length === 0 && (
-        <div className="mt-24 text-center">
-          <h1 className="text-3xl font-semibold tracking-tight text-gray-800 dark:text-gray-200">
+        <div className="mx-auto w-full max-w-3xl">
+          <h1 className="mb-6 text-2xl font-semibold tracking-tight text-gray-800 dark:text-gray-200">
             Hello World
           </h1>
+          <MindCards onSelect={onCardSelect} />
         </div>
       )}
       <div className="mx-auto w-full max-w-3xl space-y-6">

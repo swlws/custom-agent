@@ -32,6 +32,13 @@ export interface Session {
   memories: Memory[];
   messages: ChatMessage[];
   persona?: Persona;
+  mindCards?: MindCard[];
+}
+
+export interface MindCard {
+  title: string;
+  desc: string;
+  prompt: string;
 }
 
 const SESSIONS_DIR = path.join(process.cwd(), ".sessions");

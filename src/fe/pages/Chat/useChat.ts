@@ -28,8 +28,7 @@ export function useChat() {
     setLoading(false);
   }
 
-  function send() {
-    const text = input.trim();
+  function sendText(text: string) {
     if (!text || loading) return;
 
     const next: ChatMessage[] = [...messages, { role: "user", content: text }];
@@ -70,6 +69,10 @@ export function useChat() {
     });
   }
 
+  function send() {
+    sendText(input.trim());
+  }
+
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -77,5 +80,5 @@ export function useChat() {
     }
   }
 
-  return { messages, input, setInput, loading, send, newChat, loadHistory, handleKeyDown };
+  return { messages, input, setInput, loading, send, sendText, newChat, loadHistory, handleKeyDown };
 }

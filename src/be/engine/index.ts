@@ -2,6 +2,7 @@ import { chatStream } from "@/be/lib/llm";
 import { buildContextMessages, updateSession } from "@/be/memory";
 import { loadSession, saveSession } from "@/be/session";
 import { generatePersona } from "@/be/persona";
+import { generateMindCards } from "@/be/mindcards";
 
 export interface QueryHandlers {
   onToken: (token: string) => void;
@@ -42,7 +43,11 @@ export class QueryEngine {
 
           if (memoriesChanged) {
             return generatePersona(updated)
-              .then((persona) => saveSession(uid, { ...updated, persona }))
+              .then((persona) =>
+                generateMindCards(persona)
+                  .then((mindCards) => saveSession(uid, { ...updated, persona, mindCards }))
+                  .catch(() => saveSession(uid, { ...updated, persona }))
+              )
               .catch((err) => {
                 console.error("[persona] failed to generate:", err);
                 return saveSession(uid, updated);

@@ -117,5 +117,5 @@ export async function updateSession(
   const recent = messages.slice(-KEEP_RECENT);
   const memories = await extractMemories(session.memories, overflow);
 
-  return { memories, messages: recent };
+  return { ...session, memories, messages: recent };
 }
