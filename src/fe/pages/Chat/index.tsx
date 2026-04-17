@@ -8,7 +8,7 @@ import { InputBar } from "./InputBar";
 import { PersonaPanel } from "./PersonaPanel";
 import { ConversationList } from "./ConversationList";
 import { SettingsPanel } from "./SettingsPanel";
-import { type AppSettings, loadSettings } from "@/fe/lib/settings";
+import type { AppSettings } from "@/fe/lib/settings";
 
 export default function Chat() {
   const {
@@ -30,10 +30,8 @@ export default function Chat() {
   const [personaOpen, setPersonaOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [settings, setSettings] = useState<AppSettings>(() => loadSettings());
 
   useEffect(() => {
-    setSettings(loadSettings());
     loadConversationList();
   }, [loadConversationList]);
 
@@ -60,12 +58,7 @@ export default function Chat() {
         onNewChat={handleNewChat}
         sidebarOpen={sidebarOpen}
       />
-      <MessageList
-        messages={messages}
-        loading={loading}
-        onCardSelect={sendText}
-        mindCardsDisplayCount={settings.mindCardsDisplayCount}
-      />
+      <MessageList messages={messages} loading={loading} onCardSelect={sendText} />
       <InputBar
         value={input}
         onChange={setInput}
@@ -80,7 +73,7 @@ export default function Chat() {
       <SettingsPanel
         isOpen={settingsOpen}
         onClose={() => setSettingsOpen(false)}
-        onSave={(s) => setSettings(s)}
+        onSave={(_s: AppSettings) => {}}
       />
     </div>
   );

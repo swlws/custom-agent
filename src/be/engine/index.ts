@@ -9,8 +9,9 @@ import {
   savePersonaData,
   loadMindCardsData,
   saveMindCardsData,
+  loadUserSettings,
 } from "@/be/session";
-import type { ChatSettings } from "@/be/services/chatSseService";
+import { loadDefaultSettings, mergeSettings } from "@/be/config/settings";
 
 export interface QueryHandlers {
   onToken: (token: string) => void;
@@ -24,13 +25,19 @@ export class QueryEngine {
     conversationId: string,
     content: string,
     handlers: QueryHandlers,
-    settings: ChatSettings,
     signal?: AbortSignal,
   ): Promise<void> {
     const { onToken, onDone, onError } = handlers;
-    const { cacheCount, personaHours, mindCardsHours } = settings;
 
     try {
+      // 加载合并后的设置
+      const [defaults, userOverrides] = await Promise.all([
+        loadDefaultSettings(),
+        loadUserSettings(uid),
+      ]);
+      const settings = mergeSettings(defaults, userOverrides);
+      const { conversationCacheCount, personaUpdateHours, mindCardsUpdateHours } = settings;
+
       const conv = await loadConversation(uid, conversationId);
       const contextMessages = buildContextMessages(conv, content);
 
@@ -42,23 +49,23 @@ export class QueryEngine {
 
       onDone();
 
-      // 保存当前会话（按设置的缓存数量压缩）
+      // 保存当前会话
       const withMessages = appendMessages(conv, content, assistantReply);
-      const { conv: withMemory } = await compactMemories(withMessages, cacheCount);
+      const { conv: withMemory } = await compactMemories(withMessages, conversationCacheCount);
       await saveConversation(uid, conversationId, withMemory);
 
-      // 聚合所有会话，按设置的 TTL 刷新全局 persona / mindcards
+      // 聚合所有会话，刷新全局 persona / mindcards
       const metas = await listConversations(uid);
       const allConversations = await Promise.all(
         metas.map((m) => loadConv(uid, m.conversationId)),
       );
 
       const personaData = await loadPersonaData(uid);
-      const newPersonaData = await refreshPersona(uid, allConversations, personaData, personaHours);
+      const newPersonaData = await refreshPersona(uid, allConversations, personaData, personaUpdateHours);
       await savePersonaData(uid, newPersonaData);
 
       const mindCardsData = await loadMindCardsData(uid);
-      const newMindCardsData = await refreshMindCards(allConversations, newPersonaData.persona, mindCardsData, mindCardsHours);
+      const newMindCardsData = await refreshMindCards(allConversations, newPersonaData.persona, mindCardsData, mindCardsUpdateHours);
       await saveMindCardsData(uid, newMindCardsData);
     } catch (err) {
       if (err instanceof Error && err.name === "AbortError") return;

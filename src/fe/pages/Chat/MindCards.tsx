@@ -9,17 +9,16 @@ interface MindCard {
 
 interface MindCardsProps {
   onSelect: (prompt: string) => void;
-  displayCount?: number;
 }
 
-export function MindCards({ onSelect, displayCount = 4 }: MindCardsProps) {
+export function MindCards({ onSelect }: MindCardsProps) {
   const [cards, setCards] = useState<MindCard[]>([]);
 
   const fetchCards = useCallback(() => {
-    fetch(`/api/mindcards?uid=${encodeURIComponent(getUid())}&count=${displayCount}`)
+    fetch(`/api/mindcards?uid=${encodeURIComponent(getUid())}`)
       .then((r) => r.json())
       .then((data: MindCard[]) => setCards(data));
-  }, [displayCount]);
+  }, []);
 
   useEffect(() => {
     fetchCards();

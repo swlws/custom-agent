@@ -93,7 +93,7 @@ export async function listConversations(uid: string): Promise<ConversationMeta[]
     const metas: ConversationMeta[] = [];
     for (const entry of entries) {
       if (!entry.endsWith(".json")) continue;
-      if (entry === "persona.json" || entry === "mindcards.json") continue;
+      if (entry === "persona.json" || entry === "mindcards.json" || entry === "setting.json") continue;
       const conversationId = entry.slice(0, -5);
       try {
         const raw = await fs.readFile(path.join(dir, entry), "utf-8");
@@ -148,4 +148,22 @@ export async function saveMindCardsData(uid: string, data: MindCardsData): Promi
   await ensureUserDir(uid);
   const file = path.join(userDir(uid), "mindcards.json");
   await fs.writeFile(file, JSON.stringify(data, null, 2), "utf-8");
+}
+
+// ─── User Settings ───────────────────────────────────────────────────────────
+
+export async function loadUserSettings(uid: string): Promise<Partial<import("@/be/config/settings").AppSettings>> {
+  const file = path.join(userDir(uid), "setting.json");
+  try {
+    const raw = await fs.readFile(file, "utf-8");
+    return JSON.parse(raw);
+  } catch {
+    return {};
+  }
+}
+
+export async function saveUserSettings(uid: string, settings: Partial<import("@/be/config/settings").AppSettings>): Promise<void> {
+  await ensureUserDir(uid);
+  const file = path.join(userDir(uid), "setting.json");
+  await fs.writeFile(file, JSON.stringify(settings, null, 2), "utf-8");
 }

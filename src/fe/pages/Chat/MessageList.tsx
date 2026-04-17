@@ -7,10 +7,9 @@ interface MessageListProps {
   messages: ChatMessage[];
   loading: boolean;
   onCardSelect: (prompt: string) => void;
-  mindCardsDisplayCount?: number;
 }
 
-export function MessageList({ messages, loading, onCardSelect, mindCardsDisplayCount }: MessageListProps) {
+export function MessageList({ messages, loading, onCardSelect }: MessageListProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -24,7 +23,7 @@ export function MessageList({ messages, loading, onCardSelect, mindCardsDisplayC
           <h1 className="mb-6 text-2xl font-semibold tracking-tight text-gray-800 dark:text-gray-200">
             Hello World
           </h1>
-          <MindCards onSelect={onCardSelect} displayCount={mindCardsDisplayCount} />
+          <MindCards onSelect={onCardSelect} />
         </div>
       )}
       <div className="mx-auto w-full max-w-3xl space-y-6">

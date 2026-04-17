@@ -1,11 +1,18 @@
 import { useState, useEffect } from "react";
-import { type AppSettings, loadSettings, saveSettings, DEFAULT_SETTINGS } from "@/fe/lib/settings";
+import { type AppSettings, fetchSettings, persistSettings } from "@/fe/lib/settings";
 
 interface SettingsPanelProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (settings: AppSettings) => void;
 }
+
+const DEFAULT_FORM: AppSettings = {
+  conversationCacheCount: 4,
+  personaUpdateHours: 4,
+  mindCardsDisplayCount: 4,
+  mindCardsUpdateHours: 4,
+};
 
 const HOUR_OPTIONS = [1, 2, 4, 8, 12, 24];
 const CARD_COUNT_OPTIONS = [2, 4, 6, 8, 10, 12, 14, 16];
@@ -44,20 +51,31 @@ function Select({ value, options, onChange, format }: {
 }
 
 export function SettingsPanel({ isOpen, onClose, onSave }: SettingsPanelProps) {
-  const [form, setForm] = useState<AppSettings>(() => loadSettings());
+  const [form, setForm] = useState<AppSettings>(DEFAULT_FORM);
+  const [defaults, setDefaults] = useState<AppSettings>(DEFAULT_FORM);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (isOpen) setForm(loadSettings());
+    if (!isOpen) return;
+    fetchSettings().then((s) => {
+      setForm(s);
+      setDefaults(s);
+    });
   }, [isOpen]);
 
-  function handleSave() {
-    saveSettings(form);
-    onSave(form);
-    onClose();
+  async function handleSave() {
+    setSaving(true);
+    try {
+      const saved = await persistSettings(form);
+      onSave(saved);
+      onClose();
+    } finally {
+      setSaving(false);
+    }
   }
 
   function handleReset() {
-    setForm({ ...DEFAULT_SETTINGS });
+    setForm({ ...defaults });
   }
 
   function set<K extends keyof AppSettings>(key: K, value: AppSettings[K]) {
@@ -92,7 +110,7 @@ export function SettingsPanel({ isOpen, onClose, onSave }: SettingsPanelProps) {
 
         {/* 配置项 */}
         <div className="divide-y divide-gray-100 px-5 dark:divide-[#3f3f46]">
-          <Row label="对话缓存数量" hint={`压缩前保留最近 ${form.conversationCacheCount} 条消息，最大 10`}>
+          <Row label="对话缓存数量" hint={`压缩前保留最近 ${form.conversationCacheCount} 条消息，4-12`}>
             <div className="flex items-center gap-2">
               <input
                 type="range"
@@ -102,7 +120,7 @@ export function SettingsPanel({ isOpen, onClose, onSave }: SettingsPanelProps) {
                 onChange={(e) => set("conversationCacheCount", Number(e.target.value))}
                 className="w-24 accent-gray-800 dark:accent-gray-300"
               />
-              <span className="w-4 text-center text-sm tabular-nums text-gray-700 dark:text-gray-300">
+              <span className="w-5 text-center text-sm tabular-nums text-gray-700 dark:text-gray-300">
                 {form.conversationCacheCount}
               </span>
             </div>
@@ -153,9 +171,10 @@ export function SettingsPanel({ isOpen, onClose, onSave }: SettingsPanelProps) {
             </button>
             <button
               onClick={handleSave}
-              className="rounded-lg bg-[#202123] px-4 py-1.5 text-sm text-white transition-colors hover:bg-black dark:bg-white dark:text-[#202123] dark:hover:bg-gray-200"
+              disabled={saving}
+              className="rounded-lg bg-[#202123] px-4 py-1.5 text-sm text-white transition-colors hover:bg-black disabled:opacity-50 dark:bg-white dark:text-[#202123] dark:hover:bg-gray-200"
             >
-              保存
+              {saving ? "保存中…" : "保存"}
             </button>
           </div>
         </div>
