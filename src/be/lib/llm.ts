@@ -54,17 +54,21 @@ export async function chat(
 export async function* chatStream(
   messages: Message[],
   options: LLMOptions = {},
+  signal?: AbortSignal,
 ): AsyncGenerator<string> {
   const client = createClient();
   const { model, temperature = 0.7, maxTokens } = options;
 
-  const stream = await client.chat.completions.create({
-    model: resolveModel(model),
-    messages,
-    temperature,
-    max_tokens: maxTokens,
-    stream: true,
-  });
+  const stream = await client.chat.completions.create(
+    {
+      model: resolveModel(model),
+      messages,
+      temperature,
+      max_tokens: maxTokens,
+      stream: true,
+    },
+    { signal },
+  );
 
   for await (const chunk of stream) {
     const delta = chunk.choices[0]?.delta?.content;

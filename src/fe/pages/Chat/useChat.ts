@@ -28,6 +28,17 @@ export function useChat() {
     setLoading(false);
   }
 
+  function abort() {
+    sseRef.current?.close();
+    sseRef.current = null;
+    setLoading(false);
+    fetch("/api/chat/abort", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ uid: getUid() }),
+    }).catch(() => {});
+  }
+
   function sendText(text: string) {
     if (!text || loading) return;
 
@@ -80,5 +91,5 @@ export function useChat() {
     }
   }
 
-  return { messages, input, setInput, loading, send, sendText, newChat, loadHistory, handleKeyDown };
+  return { messages, input, setInput, loading, send, sendText, abort, newChat, loadHistory, handleKeyDown };
 }

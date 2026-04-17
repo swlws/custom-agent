@@ -8,7 +8,7 @@ import { InputBar } from "./InputBar";
 import { PersonaPanel } from "./PersonaPanel";
 
 export default function Chat() {
-  const { messages, input, setInput, loading, send, sendText, newChat, loadHistory, handleKeyDown } = useChat();
+  const { messages, input, setInput, loading, send, sendText, abort, newChat, loadHistory, handleKeyDown } = useChat();
   const [personaOpen, setPersonaOpen] = useState(false);
 
   return (
@@ -23,8 +23,10 @@ export default function Chat() {
         value={input}
         onChange={setInput}
         onSend={send}
+        onAbort={abort}
         onKeyDown={handleKeyDown}
         disabled={loading}
+        loading={loading}
       />
       <PersonaPanel isOpen={personaOpen} onClose={() => setPersonaOpen(false)} />
     </div>

@@ -11,7 +11,12 @@ export interface QueryHandlers {
 }
 
 export class QueryEngine {
-  async run(uid: string, content: string, handlers: QueryHandlers): Promise<void> {
+  async run(
+    uid: string,
+    content: string,
+    handlers: QueryHandlers,
+    signal?: AbortSignal,
+  ): Promise<void> {
     const { onToken, onDone, onError } = handlers;
 
     try {
@@ -19,7 +24,7 @@ export class QueryEngine {
       const contextMessages = buildContextMessages(session, content);
 
       let assistantReply = "";
-      for await (const chunk of chatStream(contextMessages)) {
+      for await (const chunk of chatStream(contextMessages, {}, signal)) {
         assistantReply += chunk;
         onToken(chunk);
       }
@@ -35,6 +40,7 @@ export class QueryEngine {
       const afterCards = await refreshMindCards(afterPersona);
       await saveSession(uid, afterCards);
     } catch (err) {
+      if (err instanceof Error && err.name === "AbortError") return;
       onError(err instanceof Error ? err : new Error("Unknown error"));
     }
   }

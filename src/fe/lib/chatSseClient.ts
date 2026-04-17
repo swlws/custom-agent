@@ -9,8 +9,7 @@ type ConnectChatSseParams = {
 };
 
 /**
- * Connect to `/api/chat` SSE stream.
- * Only the current user message is sent; history is managed server-side.
+ * Connect to `/api/chat` SSE stream via EventSource.
  * The server sends `data: [DONE]` or `data: {"type":"token"|"error","content":...}`.
  */
 export function connectChatSse({
@@ -19,7 +18,7 @@ export function connectChatSse({
   onToken,
   onDone,
   onError,
-}: ConnectChatSseParams): { close: () => void; eventSource: EventSource } {
+}: ConnectChatSseParams): { close: () => void } {
   const url = `/api/chat?uid=${encodeURIComponent(uid)}&content=${encodeURIComponent(content)}`;
   const es = new EventSource(url);
 
@@ -63,5 +62,5 @@ export function connectChatSse({
     onError?.(new Error("Connection lost"));
   };
 
-  return { close, eventSource: es };
+  return { close };
 }

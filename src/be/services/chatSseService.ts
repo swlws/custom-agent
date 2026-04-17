@@ -1,8 +1,10 @@
 import { QueryEngine } from "@/be/engine";
+import { registerAbort, releaseAbort } from "./abortRegistry";
 
 const engine = new QueryEngine();
 
 function createSSEStream(uid: string, content: string) {
+  const signal = registerAbort(uid);
   const encoder = new TextEncoder();
 
   const stream = new ReadableStream({
@@ -12,12 +14,18 @@ function createSSEStream(uid: string, content: string) {
       };
 
       try {
-        await engine.run(uid, content, {
-          onToken: (chunk) => sendEvent(JSON.stringify({ type: "token", content: chunk })),
-          onDone:  () => sendEvent("[DONE]"),
-          onError: (err) => sendEvent(JSON.stringify({ type: "error", content: err.message })),
-        });
+        await engine.run(
+          uid,
+          content,
+          {
+            onToken: (chunk) => sendEvent(JSON.stringify({ type: "token", content: chunk })),
+            onDone:  () => sendEvent("[DONE]"),
+            onError: (err) => sendEvent(JSON.stringify({ type: "error", content: err.message })),
+          },
+          signal,
+        );
       } finally {
+        releaseAbort(uid);
         controller.close();
       }
     },
