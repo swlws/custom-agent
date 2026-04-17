@@ -1,8 +1,6 @@
 import { chat } from "@/be/lib/llm";
 import type { ConversationData, Persona, MindCard, MindCardsData } from "@/be/session";
 
-const MINDCARDS_TTL_MS = 4 * 60 * 60 * 1000; // 4 hours
-
 const MINDCARDS_PROMPT = `你是一个对话引导专家。根据用户的人物画像和当前对话上下文，生成 16 张心智卡片，帮助用户快速开始有价值的对话。
 
 每张卡片要求：
@@ -90,7 +88,9 @@ export async function refreshMindCards(
   conversations: ConversationData[],
   persona: Persona | null,
   currentData: MindCardsData,
+  ttlHours = 4,
 ): Promise<MindCardsData> {
+  const MINDCARDS_TTL_MS = ttlHours * 60 * 60 * 1000;
   // 检查 TTL
   const elapsed = Date.now() - new Date(currentData.updatedAt).getTime();
   if ((currentData.cards.length ?? 0) > 0 && elapsed <= MINDCARDS_TTL_MS) {

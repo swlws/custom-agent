@@ -7,6 +7,8 @@ import { MessageList } from "./MessageList";
 import { InputBar } from "./InputBar";
 import { PersonaPanel } from "./PersonaPanel";
 import { ConversationList } from "./ConversationList";
+import { SettingsPanel } from "./SettingsPanel";
+import { type AppSettings, loadSettings } from "@/fe/lib/settings";
 
 export default function Chat() {
   const {
@@ -27,8 +29,11 @@ export default function Chat() {
 
   const [personaOpen, setPersonaOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settings, setSettings] = useState<AppSettings>(() => loadSettings());
 
   useEffect(() => {
+    setSettings(loadSettings());
     loadConversationList();
   }, [loadConversationList]);
 
@@ -50,11 +55,17 @@ export default function Chat() {
 
       <ChatHeader
         onOpenPersona={() => setPersonaOpen(true)}
+        onOpenSettings={() => setSettingsOpen(true)}
         onToggleSidebar={() => setSidebarOpen((v) => !v)}
         onNewChat={handleNewChat}
         sidebarOpen={sidebarOpen}
       />
-      <MessageList messages={messages} loading={loading} onCardSelect={sendText} />
+      <MessageList
+        messages={messages}
+        loading={loading}
+        onCardSelect={sendText}
+        mindCardsDisplayCount={settings.mindCardsDisplayCount}
+      />
       <InputBar
         value={input}
         onChange={setInput}
@@ -66,6 +77,11 @@ export default function Chat() {
       />
 
       <PersonaPanel isOpen={personaOpen} onClose={() => setPersonaOpen(false)} />
+      <SettingsPanel
+        isOpen={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        onSave={(s) => setSettings(s)}
+      />
     </div>
   );
 }

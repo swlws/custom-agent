@@ -1,8 +1,6 @@
 import { chat } from "@/be/lib/llm";
 import type { ConversationData, Persona, PersonaData } from "@/be/session";
 
-const PERSONA_TTL_MS = 4 * 60 * 60 * 1000; // 4 hours
-
 const PERSONA_PROMPT = `你是一个洞察力敏锐、充满创意的用户画像分析师。请根据对话记忆与消息，深度提炼用户的人物画像。
 
 分析维度（有据可依则输出，无从判断则跳过，不强求每项都有）：
@@ -74,7 +72,9 @@ export async function refreshPersona(
   uid: string,
   conversations: ConversationData[],
   currentData: PersonaData,
+  ttlHours = 4,
 ): Promise<PersonaData> {
+  const PERSONA_TTL_MS = ttlHours * 60 * 60 * 1000;
   // 无内容时，人物画像为空
   const hasContent = conversations.some(
     (c) => c.memories.length > 0 || c.messages.length > 0,

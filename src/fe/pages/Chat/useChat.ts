@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { connectChatSse, ChatMessage } from "@/fe/lib/chatSseClient";
 import { getUid, getConversationId, createNewConversationId, setConversationId } from "@/fe/lib/uid";
+import { loadSettings } from "@/fe/lib/settings";
 
 export interface ConversationMeta {
   conversationId: string;
@@ -83,6 +84,7 @@ export function useChat() {
       uid: getUid(),
       conversationId: cid,
       content: text,
+      ...loadSettings(),
       onToken: (token) => {
         setMessages((prev) => {
           const updated = [...prev];

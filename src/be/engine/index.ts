@@ -10,6 +10,7 @@ import {
   loadMindCardsData,
   saveMindCardsData,
 } from "@/be/session";
+import type { ChatSettings } from "@/be/services/chatSseService";
 
 export interface QueryHandlers {
   onToken: (token: string) => void;
@@ -23,9 +24,11 @@ export class QueryEngine {
     conversationId: string,
     content: string,
     handlers: QueryHandlers,
+    settings: ChatSettings,
     signal?: AbortSignal,
   ): Promise<void> {
     const { onToken, onDone, onError } = handlers;
+    const { cacheCount, personaHours, mindCardsHours } = settings;
 
     try {
       const conv = await loadConversation(uid, conversationId);
@@ -39,23 +42,23 @@ export class QueryEngine {
 
       onDone();
 
-      // 保存当前会话
+      // 保存当前会话（按设置的缓存数量压缩）
       const withMessages = appendMessages(conv, content, assistantReply);
-      const { conv: withMemory } = await compactMemories(withMessages);
+      const { conv: withMemory } = await compactMemories(withMessages, cacheCount);
       await saveConversation(uid, conversationId, withMemory);
 
-      // 聚合所有会话，刷新全局 persona / mindcards（4小时 TTL）
+      // 聚合所有会话，按设置的 TTL 刷新全局 persona / mindcards
       const metas = await listConversations(uid);
       const allConversations = await Promise.all(
         metas.map((m) => loadConv(uid, m.conversationId)),
       );
 
       const personaData = await loadPersonaData(uid);
-      const newPersonaData = await refreshPersona(uid, allConversations, personaData);
+      const newPersonaData = await refreshPersona(uid, allConversations, personaData, personaHours);
       await savePersonaData(uid, newPersonaData);
 
       const mindCardsData = await loadMindCardsData(uid);
-      const newMindCardsData = await refreshMindCards(allConversations, newPersonaData.persona, mindCardsData);
+      const newMindCardsData = await refreshMindCards(allConversations, newPersonaData.persona, mindCardsData, mindCardsHours);
       await saveMindCardsData(uid, newMindCardsData);
     } catch (err) {
       if (err instanceof Error && err.name === "AbortError") return;

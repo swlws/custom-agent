@@ -56,13 +56,13 @@ export interface CompactMemoriesResult {
  * When messages exceed the window, compress overflow into typed memories.
  * No-op when within the window.
  */
-export async function compactMemories(conv: ConversationData): Promise<CompactMemoriesResult> {
-  if (conv.messages.length <= KEEP_RECENT) {
+export async function compactMemories(conv: ConversationData, keepRecent = 4): Promise<CompactMemoriesResult> {
+  if (conv.messages.length <= keepRecent) {
     return { conv, memoriesChanged: false };
   }
 
-  const overflow = conv.messages.slice(0, conv.messages.length - KEEP_RECENT);
-  const recent = conv.messages.slice(-KEEP_RECENT);
+  const overflow = conv.messages.slice(0, conv.messages.length - keepRecent);
+  const recent = conv.messages.slice(-keepRecent);
   const memories = await extractMemories(conv.memories, overflow);
 
   const memoriesChanged = JSON.stringify(memories) !== JSON.stringify(conv.memories);

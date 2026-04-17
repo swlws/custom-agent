@@ -1,9 +1,15 @@
 import { QueryEngine } from "@/be/engine";
 import { registerAbort, releaseAbort } from "./abortRegistry";
 
+export interface ChatSettings {
+  cacheCount: number;
+  personaHours: number;
+  mindCardsHours: number;
+}
+
 const engine = new QueryEngine();
 
-function createSSEStream(uid: string, conversationId: string, content: string) {
+function createSSEStream(uid: string, conversationId: string, content: string, settings: ChatSettings) {
   const signal = registerAbort(uid);
   const encoder = new TextEncoder();
 
@@ -23,6 +29,7 @@ function createSSEStream(uid: string, conversationId: string, content: string) {
             onDone:  () => sendEvent("[DONE]"),
             onError: (err) => sendEvent(JSON.stringify({ type: "error", content: err.message })),
           },
+          settings,
           signal,
         );
       } finally {
@@ -42,6 +49,6 @@ function createSSEStream(uid: string, conversationId: string, content: string) {
   });
 }
 
-export function createChatSseResponse(uid: string, conversationId: string, content: string) {
-  return createSSEStream(uid, conversationId, content);
+export function createChatSseResponse(uid: string, conversationId: string, content: string, settings: ChatSettings) {
+  return createSSEStream(uid, conversationId, content, settings);
 }

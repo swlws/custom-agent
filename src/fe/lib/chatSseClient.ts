@@ -4,6 +4,9 @@ type ConnectChatSseParams = {
   uid: string;
   conversationId: string;
   content: string;
+  conversationCacheCount?: number;
+  personaUpdateHours?: number;
+  mindCardsUpdateHours?: number;
   onToken: (token: string) => void;
   onDone?: () => void;
   onError?: (error: Error) => void;
@@ -17,11 +20,14 @@ export function connectChatSse({
   uid,
   conversationId,
   content,
+  conversationCacheCount = 4,
+  personaUpdateHours = 4,
+  mindCardsUpdateHours = 4,
   onToken,
   onDone,
   onError,
 }: ConnectChatSseParams): { close: () => void } {
-  const url = `/api/chat?uid=${encodeURIComponent(uid)}&conversationId=${encodeURIComponent(conversationId)}&content=${encodeURIComponent(content)}`;
+  const url = `/api/chat?uid=${encodeURIComponent(uid)}&conversationId=${encodeURIComponent(conversationId)}&content=${encodeURIComponent(content)}&cacheCount=${conversationCacheCount}&personaHours=${personaUpdateHours}&mindCardsHours=${mindCardsUpdateHours}`;
   const es = new EventSource(url);
 
   let finished = false;
