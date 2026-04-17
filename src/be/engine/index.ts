@@ -13,6 +13,12 @@ import {
 } from "@/be/session";
 import { loadDefaultSettings, mergeSettings } from "@/be/config/settings";
 
+export interface QueryParams {
+  uid: string;
+  conversationId: string;
+  content: string;
+}
+
 export interface QueryHandlers {
   onToken: (token: string) => void;
   onDone: () => void;
@@ -21,12 +27,11 @@ export interface QueryHandlers {
 
 export class QueryEngine {
   async run(
-    uid: string,
-    conversationId: string,
-    content: string,
+    params: QueryParams,
     handlers: QueryHandlers,
     signal?: AbortSignal,
   ): Promise<void> {
+    const { uid, conversationId, content } = params;
     const { onToken, onDone, onError } = handlers;
 
     try {

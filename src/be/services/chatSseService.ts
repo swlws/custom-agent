@@ -15,9 +15,7 @@ function createSSEStream(uid: string, conversationId: string, content: string) {
 
       try {
         await engine.run(
-          uid,
-          conversationId,
-          content,
+          { uid, conversationId, content },
           {
             onToken: (chunk) => sendEvent(JSON.stringify({ type: "token", content: chunk })),
             onDone:  () => sendEvent("[DONE]"),
