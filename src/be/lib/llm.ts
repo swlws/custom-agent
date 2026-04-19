@@ -9,21 +9,21 @@ export interface LLMOptions {
 }
 
 function createClient(): OpenAI {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) throw new Error("OPENAI_API_KEY is not set");
+  const apiKey = process.env.SWLWS_OPENAI_API_KEY;
+  if (!apiKey) throw new Error("SWLWS_OPENAI_API_KEY is not set");
 
   return new OpenAI({
     apiKey,
-    baseURL: process.env.OPENAI_BASE_URL,
+    baseURL: process.env.SWLWS_OPENAI_BASE_URL,
   });
 }
 
 function resolveModel(explicitModel?: string): string {
   // `OPENAI_MODE` is kept for backwards compatibility with current `.env.local`.
-  const model = explicitModel || process.env.OPENAI_MODEL
-  if (!model) throw new Error("OPENAI_MODEL is not set");
-  
-  return model
+  const model = explicitModel || process.env.SWLWS_OPENAI_MODEL;
+  if (!model) throw new Error("SWLWS_OPENAI_MODEL is not set");
+
+  return model;
 }
 
 /**
@@ -87,4 +87,3 @@ export async function prompt(
   messages.push({ role: "user", content: userMessage });
   return chat(messages, options);
 }
-
