@@ -20,12 +20,10 @@ function createClient(): OpenAI {
 
 function resolveModel(explicitModel?: string): string {
   // `OPENAI_MODE` is kept for backwards compatibility with current `.env.local`.
-  return (
-    explicitModel ||
-    process.env.OPENAI_MODEL ||
-    process.env.OPENAI_MODE ||
-    "gpt-4o-mini"
-  );
+  const model = explicitModel || process.env.OPENAI_MODEL
+  if (!model) throw new Error("OPENAI_MODEL is not set");
+  
+  return model
 }
 
 /**
