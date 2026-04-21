@@ -31,7 +31,8 @@ export function buildContextMessages(
 
   return [
     { role: "system", content: parts.join("\n\n") },
-    ...conv.messages,
+    // 只取最近 4 次对话（8 条消息）传给 LLM，更早的历史已提炼进 memories
+    ...conv.messages.slice(-8),
     { role: "user", content: currentContent },
   ];
 }

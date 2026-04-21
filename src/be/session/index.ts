@@ -33,6 +33,8 @@ export interface MindCard {
 export interface ConversationData {
   memories: Memory[];
   messages: ChatMessage[];
+  /** 已纳入摘要的消息条数游标，用于判断是否触发重新生成摘要 */
+  summarizedUpTo: number;
   /** 第一条用户消息，用于列表展示 */
   title?: string;
   createdAt: string;
@@ -81,10 +83,13 @@ export async function loadConversation(uid: string, conversationId: string): Pro
   const file = path.join(conversationDir(uid), `${conversationId}.json`);
   try {
     const raw = await fs.readFile(file, "utf-8");
-    return JSON.parse(raw) as ConversationData;
+    const data = JSON.parse(raw) as ConversationData;
+    // 兼容旧文件：summarizedUpTo 字段缺失时默认为 0
+    if (data.summarizedUpTo === undefined) data.summarizedUpTo = 0;
+    return data;
   } catch {
     const now = new Date().toISOString();
-    return { memories: [], messages: [], createdAt: now, updatedAt: now };
+    return { memories: [], messages: [], summarizedUpTo: 0, createdAt: now, updatedAt: now };
   }
 }
 

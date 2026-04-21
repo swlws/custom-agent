@@ -3,7 +3,8 @@ import { generateImage } from "@/be/lib/image-gen";
 import {
   buildContextMessages,
   appendMessages,
-  compactMemories,
+  trimMessages,
+  maybeUpdateSummary,
   refreshPersona,
   refreshMindCards,
 } from "@/be/memory";
@@ -62,7 +63,8 @@ export class QueryEngine {
         conv,
         content,
         assistantReply,
-        settings.conversationCacheCount,
+        settings.maxMessagesCount,
+        settings.summaryTriggerCount,
       );
 
       await this._updateGlobalKnowledge(
@@ -125,14 +127,13 @@ export class QueryEngine {
     conv: ConversationData,
     content: string,
     assistantReply: string,
-    cacheCount: number,
+    maxMessagesCount: number,
+    summaryTriggerCount: number,
   ) {
     const withMessages = appendMessages(conv, content, assistantReply);
-    const { conv: withMemory } = await compactMemories(
-      withMessages,
-      cacheCount,
-    );
-    await saveConversation(uid, conversationId, withMemory);
+    const trimmed = trimMessages(withMessages, maxMessagesCount);
+    const withSummary = await maybeUpdateSummary(trimmed, summaryTriggerCount);
+    await saveConversation(uid, conversationId, withSummary);
   }
 
   private async _updateGlobalKnowledge(

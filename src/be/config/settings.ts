@@ -2,8 +2,10 @@ import fs from "fs/promises";
 import path from "path";
 
 export interface AppSettings {
-  /** 对话缓存消息条数（压缩前保留的最近消息数），4-12 */
-  conversationCacheCount: number;
+  /** 会话消息存储上限（条），超出时从头部截断，不触发 LLM */
+  maxMessagesCount: number;
+  /** 每新增多少条消息触发一次历史摘要重新生成（须为偶数，2 条 = 1 次对话） */
+  summaryTriggerCount: number;
   /** 人物画像更新间隔（小时） */
   personaUpdateHours: number;
   /** 默认展示的心智卡片数量，2 的倍数，最多 16 */
@@ -28,7 +30,8 @@ export async function loadDefaultSettings(): Promise<AppSettings> {
   } catch {
     // 文件缺失时的硬编码兜底
     _defaultCache = {
-      conversationCacheCount: 4,
+      maxMessagesCount: 100,
+      summaryTriggerCount: 8,
       personaUpdateHours: 4,
       mindCardsDisplayCount: 4,
       mindCardsUpdateHours: 4,

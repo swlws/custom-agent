@@ -1,5 +1,6 @@
 {
-  "conversationCacheCount": 4,
+  "maxMessagesCount": 100,
+  "summaryTriggerCount": 8,
   "personaUpdateHours": 4,
   "mindCardsDisplayCount": 4,
   "mindCardsUpdateHours": 4
