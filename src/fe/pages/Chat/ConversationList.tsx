@@ -1,7 +1,6 @@
 import type { ConversationMeta } from "./useChat";
 import { NavIconButton } from "@/fe/components/NavIconButton";
 import {
-  SidebarToggleIcon,
   NewChatIcon,
   PersonaIcon,
   SettingsIcon,
@@ -13,7 +12,6 @@ interface ConversationListProps {
   currentId: string;
   onSelect: (id: string) => void;
   onNewChat: () => void;
-  onToggle: () => void;
   onOpenPersona: () => void;
   onOpenSettings: () => void;
 }
@@ -41,7 +39,6 @@ export function ConversationList({
   currentId,
   onSelect,
   onNewChat,
-  onToggle,
   onOpenPersona,
   onOpenSettings,
 }: ConversationListProps) {
@@ -53,15 +50,6 @@ export function ConversationList({
     >
       {/* 上方功能按钮区 */}
       <div className="flex flex-col gap-1 px-2 py-3">
-      {/* 展开/收起按钮 */}
-        <NavIconButton
-          onClick={onToggle}
-          title={open ? "收起侧边栏" : "展开侧边栏"}
-          icon={<SidebarToggleIcon />}
-          label="收起侧边栏"
-          showLabel={open}
-        />
-
         {/* 新建对话按钮 */}
         <NavIconButton
           onClick={onNewChat}

@@ -7,6 +7,7 @@ import { InputBar } from "./InputBar";
 import { PersonaPanel } from "./PersonaPanel";
 import { ConversationList } from "./ConversationList";
 import { SettingsPanel } from "./SettingsPanel";
+import { ChatHeader } from "./ChatHeader";
 
 export default function Chat() {
   const {
@@ -39,7 +40,6 @@ export default function Chat() {
       {/* 左侧固定导航栏 */}
       <ConversationList
         open={sidebarOpen}
-        onToggle={() => setSidebarOpen((v) => !v)}
         conversations={conversations}
         currentId={conversationId}
         onSelect={switchConversation}
@@ -50,6 +50,10 @@ export default function Chat() {
 
       {/* 右侧主内容区 */}
       <div className="flex flex-1 flex-col overflow-hidden">
+        <ChatHeader
+          sidebarOpen={sidebarOpen}
+          onToggleSidebar={() => setSidebarOpen((v) => !v)}
+        />
         <MessageList
           messages={messages}
           loading={loading}
