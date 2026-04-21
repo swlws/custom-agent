@@ -1,0 +1,25 @@
+src/fe/pages/Chat/index.tsx
+  22c6c19f78cb14b1 10,53-56
+src/fe/pages/Chat/ChatHeader.tsx
+  22c6c19f78cb14b1 1-20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.2",
+  "base_commit_sha": "d4bea8a9a587cb97bba6e6f737c65950903c5ede",
+  "prompts": {
+    "22c6c19f78cb14b1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a5dd9010-101e-4894-bf57-5c91c96df6cf",
+        "model": "mcs-5"
+      },
+      "human_author": "swlws",
+      "messages": [],
+      "total_additions": 29,
+      "total_deletions": 17,
+      "accepted_lines": 25,
+      "overriden_lines": 0
+    }
+  }
+}
