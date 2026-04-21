@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useChat } from "./useChat";
-import { ChatHeader } from "./ChatHeader";
 import { MessageList } from "./MessageList";
 import { InputBar } from "./InputBar";
 import { PersonaPanel } from "./PersonaPanel";
@@ -23,8 +22,9 @@ export default function Chat() {
   } = useChat();
 
   const [personaOpen, setPersonaOpen] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [settingsOpen, setSettingsOpen] = useState(false);
+
   useEffect(() => {
     loadConversationList();
   }, [loadConversationList]);
@@ -35,35 +35,34 @@ export default function Chat() {
   }
 
   return (
-    <div className="mx-auto flex h-screen w-full max-w-4xl flex-col bg-white text-gray-900 dark:bg-[#212121] dark:text-gray-100">
+    <div className="flex h-screen w-full overflow-hidden bg-white text-gray-900 dark:bg-[#212121] dark:text-gray-100">
+      {/* 左侧固定导航栏 */}
       <ConversationList
         open={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
+        onToggle={() => setSidebarOpen((v) => !v)}
         conversations={conversations}
         currentId={conversationId}
         onSelect={switchConversation}
         onNewChat={handleNewChat}
-      />
-
-      <ChatHeader
         onOpenPersona={() => setPersonaOpen(true)}
         onOpenSettings={() => setSettingsOpen(true)}
-        onToggleSidebar={() => setSidebarOpen((v) => !v)}
-        onNewChat={handleNewChat}
-        sidebarOpen={sidebarOpen}
       />
-      <MessageList
-        messages={messages}
-        loading={loading}
-        onCardSelect={sendText}
-      />
-      <InputBar
-        onSend={sendText}
-        onAbort={abort}
-        disabled={loading}
-        loading={loading}
-        conversationId={conversationId}
-      />
+
+      {/* 右侧主内容区 */}
+      <div className="flex flex-1 flex-col overflow-hidden">
+        <MessageList
+          messages={messages}
+          loading={loading}
+          onCardSelect={sendText}
+        />
+        <InputBar
+          onSend={sendText}
+          onAbort={abort}
+          disabled={loading}
+          loading={loading}
+          conversationId={conversationId}
+        />
+      </div>
 
       <PersonaPanel
         isOpen={personaOpen}
