@@ -114,29 +114,35 @@ export async function solveStep(
     };
     currentMessages = [...currentMessages, assistantMessage];
 
-    for (const tc of toolCalls) {
-      const args = (() => {
-        try {
-          return JSON.parse(tc.function.arguments) as Record<string, unknown>;
-        } catch {
-          return {};
-        }
-      })();
+    // 并行执行所有工具调用
+    const toolResults = await Promise.all(
+      toolCalls.map(async (tc) => {
+        const args = (() => {
+          try {
+            return JSON.parse(tc.function.arguments) as Record<string, unknown>;
+          } catch {
+            return {};
+          }
+        })();
 
-      onEvent({ type: "tool_call", name: tc.function.name, args });
+        onEvent({ type: "tool_call", name: tc.function.name, args });
+        const result = await executeTool(tc.function.name, args, signal);
+        onEvent({ type: "tool_result", name: tc.function.name, result: result.content, isError: result.isError });
 
-      const result = await executeTool(tc.function.name, args, signal);
+        return { tc, result };
+      }),
+    );
 
-      onEvent({ type: "tool_result", name: tc.function.name, result });
-
-      const resultBlock = `\n\n> **工具：${tc.function.name}**\n> ${result.split("\n").join("\n> ")}\n\n`;
+    // 按顺序推流 Observation 并追加消息历史
+    for (const { tc, result } of toolResults) {
+      const resultBlock = `\n\n> **工具：${tc.function.name}**\n> ${result.content.split("\n").join("\n> ")}\n\n`;
       fullOutput += resultBlock;
       onToken(resultBlock);
 
       currentMessages.push({
         role: "tool",
         tool_call_id: tc.id,
-        content: result,
+        content: result.content,
       });
     }
   }

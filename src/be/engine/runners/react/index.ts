@@ -1,9 +1,9 @@
 import OpenAI from "openai";
-import { Message } from "@/be/lib/text-llm";
 import { getToolDefinitions, executeTool } from "@/be/engine/tools";
 import type { ModeRunner } from "@/be/engine/runners";
 
-const MAX_ITERATIONS = 8;
+/** Token 预算：累计消耗超过此值时，完成当前迭代后优雅退出（软约束） */
+const TOKEN_BUDGET = 32_000;
 
 function createClient(): OpenAI {
   const apiKey = process.env.SWLWS_TEXT_LLM_API_KEY;
@@ -19,7 +19,11 @@ function resolveModel(): string {
 
 /**
  * ReAct 模式：Thought → Action → Observation 循环，直到 LLM 不再调用工具
- * 每次迭代的文本输出和工具结果都实时流式推送
+ *
+ * 优化项：
+ * 1. Token 预算（软约束）：累计 token 超过 TOKEN_BUDGET 后不再发起新迭代
+ * 2. 并行工具调用：同一轮 tool_calls 并发执行，全部完成后按序推流
+ * 3. 错误透传：工具失败时将错误内容回传给 LLM，由模型决策是否重试
  */
 export const reactRunner: ModeRunner = {
   async execute(_content, contextMessages, { onToken, onEvent }, signal) {
@@ -28,13 +32,11 @@ export const reactRunner: ModeRunner = {
     const toolDefinitions = getToolDefinitions();
 
     let fullReply = "";
-    let iterations = 0;
+    let usedTokens = 0;
     let messages: OpenAI.Chat.ChatCompletionMessageParam[] =
       contextMessages as OpenAI.Chat.ChatCompletionMessageParam[];
 
-    while (iterations < MAX_ITERATIONS) {
-      iterations++;
-
+    while (usedTokens < TOKEN_BUDGET) {
       const response = await client.chat.completions.create(
         {
           model,
@@ -42,23 +44,24 @@ export const reactRunner: ModeRunner = {
           tools: toolDefinitions,
           tool_choice: "auto",
           stream: true,
+          stream_options: { include_usage: true },
           temperature: 0.7,
         },
         { signal },
       );
 
       let stepText = "";
-      const toolCalls: Array<{
-        id: string;
-        type: "function";
-        function: { name: string; arguments: string };
-      }> = [];
       const toolCallChunks: Record<
         number,
         { id: string; name: string; arguments: string }
       > = {};
 
       for await (const chunk of response) {
+        // 记录 token 用量（出现在流的末尾 chunk）
+        if (chunk.usage) {
+          usedTokens += chunk.usage.total_tokens;
+        }
+
         const delta = chunk.choices[0]?.delta;
         if (!delta) continue;
 
@@ -72,22 +75,25 @@ export const reactRunner: ModeRunner = {
           for (const tc of delta.tool_calls) {
             const idx = tc.index ?? 0;
             if (!toolCallChunks[idx]) {
-              toolCallChunks[idx] = { id: tc.id ?? "", name: "", arguments: "" };
+              toolCallChunks[idx] = {
+                id: tc.id ?? "",
+                name: "",
+                arguments: "",
+              };
             }
             if (tc.function?.name) toolCallChunks[idx].name += tc.function.name;
-            if (tc.function?.arguments) toolCallChunks[idx].arguments += tc.function.arguments;
+            if (tc.function?.arguments)
+              toolCallChunks[idx].arguments += tc.function.arguments;
             if (tc.id) toolCallChunks[idx].id = tc.id;
           }
         }
       }
 
-      for (const chunk of Object.values(toolCallChunks)) {
-        toolCalls.push({
-          id: chunk.id,
-          type: "function",
-          function: { name: chunk.name, arguments: chunk.arguments },
-        });
-      }
+      const toolCalls = Object.values(toolCallChunks).map((chunk) => ({
+        id: chunk.id,
+        type: "function" as const,
+        function: { name: chunk.name, arguments: chunk.arguments },
+      }));
 
       // 无工具调用 → LLM 已给出最终答案，结束循环
       if (toolCalls.length === 0) break;
@@ -102,27 +108,40 @@ export const reactRunner: ModeRunner = {
         },
       ];
 
-      // 逐个执行工具，将 Observation 推流并追加到历史
-      for (const tc of toolCalls) {
-        const args = (() => {
-          try {
-            return JSON.parse(tc.function.arguments) as Record<string, unknown>;
-          } catch {
-            return {};
-          }
-        })();
+      // 并行执行所有工具调用
+      const toolResults = await Promise.all(
+        toolCalls.map(async (tc) => {
+          const args = (() => {
+            try {
+              return JSON.parse(tc.function.arguments) as Record<
+                string,
+                unknown
+              >;
+            } catch {
+              return {};
+            }
+          })();
 
-        onEvent({ type: "tool_call", name: tc.function.name, args });
+          onEvent({ type: "tool_call", name: tc.function.name, args });
+          const result = await executeTool(tc.function.name, args, signal);
+          onEvent({
+            type: "tool_result",
+            name: tc.function.name,
+            result: result.content,
+            isError: result.isError,
+          });
 
-        const result = await executeTool(tc.function.name, args, signal);
+          return { tc, result };
+        }),
+      );
 
-        onEvent({ type: "tool_result", name: tc.function.name, result });
-
+      // 按顺序推流 Observation 并追加消息历史
+      for (const { tc, result } of toolResults) {
         const observationBlock =
           "\n\n> **Observation（" +
           tc.function.name +
           "）**\n> " +
-          result.split("\n").join("\n> ") +
+          result.content.split("\n").join("\n> ") +
           "\n\n";
 
         fullReply += observationBlock;
@@ -131,7 +150,7 @@ export const reactRunner: ModeRunner = {
         messages.push({
           role: "tool",
           tool_call_id: tc.id,
-          content: result,
+          content: result.content,
         });
       }
     }
