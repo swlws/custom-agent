@@ -1,5 +1,3 @@
-import { chatStream, Message } from "@/be/lib/text-llm";
-import { generateImage } from "@/be/lib/image-gen";
 import {
   buildContextMessages,
   appendMessages,
@@ -21,17 +19,23 @@ import {
   ConversationData,
 } from "@/be/session";
 import { loadDefaultSettings, mergeSettings } from "@/be/config/settings";
+import { modeRunners, type SseEvent } from "./runners";
+
+export type { SseEvent };
 
 export interface QueryParams {
   uid: string;
   conversationId: string;
   content: string;
+  /** 若传入则覆盖用户设置中的 agentMode */
+  agentMode?: "direct" | "plan-and-solve";
 }
 
 export interface QueryHandlers {
   onToken: (token: string) => void;
   onDone: () => void;
   onError: (error: Error) => void;
+  onEvent?: (event: SseEvent) => void;
 }
 
 export class QueryEngine {
@@ -41,17 +45,20 @@ export class QueryEngine {
     signal?: AbortSignal,
   ): Promise<void> {
     const { uid, conversationId, content } = params;
-    const { onDone, onError } = handlers;
+    const { onToken, onDone, onError, onEvent = () => {} } = handlers;
 
     try {
       const settings = await this._loadSettings(uid);
       const conv = await loadConversation(uid, conversationId);
       const contextMessages = buildContextMessages(conv, content);
 
-      const assistantReply = await this._generateResponse(
+      const mode = params.agentMode ?? settings.agentMode;
+      const runner = modeRunners.get(mode) ?? modeRunners.get("direct")!;
+
+      const fullAssistantReply = await runner.execute(
         content,
         contextMessages,
-        handlers,
+        { onToken, onDone, onError, onEvent },
         signal,
       );
 
@@ -62,7 +69,7 @@ export class QueryEngine {
         conversationId,
         conv,
         content,
-        assistantReply,
+        fullAssistantReply,
         settings.maxMessagesCount,
         settings.summaryTriggerCount,
       );
@@ -84,41 +91,6 @@ export class QueryEngine {
       loadUserSettings(uid),
     ]);
     return mergeSettings(defaults, userOverrides);
-  }
-
-  private async _generateResponse(
-    content: string,
-    contextMessages: Message[],
-    handlers: QueryHandlers,
-    signal?: AbortSignal,
-  ): Promise<string> {
-    const { onToken } = handlers;
-    let assistantReply = "";
-
-    if (content.includes("生成图片")) {
-      onToken("正在为您生成图片...\n\n");
-      const promptMatch = content.match(/生成图片[:：\s]*(.*)/);
-      const imagePrompt =
-        (promptMatch && promptMatch[1].trim()) ||
-        content.replace(/生成图片/g, "").trim();
-
-      try {
-        const imageUrl = await generateImage(imagePrompt || "一张精美的图片");
-        assistantReply = `![generated image](${imageUrl})`;
-        onToken(assistantReply);
-      } catch (error) {
-        console.error("Image generation failed:", error);
-        assistantReply = "抱歉，生成图片时出错了。请稍后再试。";
-        onToken(assistantReply);
-      }
-    } else {
-      for await (const chunk of chatStream(contextMessages, {}, signal)) {
-        assistantReply += chunk;
-        onToken(chunk);
-      }
-    }
-
-    return assistantReply;
   }
 
   private async _saveConversationState(

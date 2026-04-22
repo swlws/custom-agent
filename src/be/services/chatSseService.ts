@@ -3,7 +3,12 @@ import { registerAbort, releaseAbort } from "./abortRegistry";
 
 const engine = new QueryEngine();
 
-function createSSEStream(uid: string, conversationId: string, content: string) {
+function createSSEStream(
+  uid: string,
+  conversationId: string,
+  content: string,
+  agentMode?: "direct" | "plan-and-solve",
+) {
   const signal = registerAbort(uid);
   const encoder = new TextEncoder();
 
@@ -15,11 +20,12 @@ function createSSEStream(uid: string, conversationId: string, content: string) {
 
       try {
         await engine.run(
-          { uid, conversationId, content },
+          { uid, conversationId, content, agentMode },
           {
             onToken: (chunk) => sendEvent(JSON.stringify({ type: "token", content: chunk })),
             onDone:  () => sendEvent("[DONE]"),
             onError: (err) => sendEvent(JSON.stringify({ type: "error", content: err.message })),
+            onEvent: (event) => sendEvent(JSON.stringify(event)),
           },
           signal,
         );
@@ -40,6 +46,11 @@ function createSSEStream(uid: string, conversationId: string, content: string) {
   });
 }
 
-export function createChatSseResponse(uid: string, conversationId: string, content: string) {
-  return createSSEStream(uid, conversationId, content);
+export function createChatSseResponse(
+  uid: string,
+  conversationId: string,
+  content: string,
+  agentMode?: "direct" | "plan-and-solve",
+) {
+  return createSSEStream(uid, conversationId, content, agentMode);
 }

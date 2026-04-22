@@ -20,6 +20,8 @@ export default function Chat() {
     loadConversationList,
     switchConversation,
     conversationId,
+    agentMode,
+    setAgentMode,
   } = useChat();
 
   const [personaOpen, setPersonaOpen] = useState(false);
@@ -65,6 +67,8 @@ export default function Chat() {
           disabled={loading}
           loading={loading}
           conversationId={conversationId}
+          agentMode={agentMode}
+          onModeChange={setAgentMode}
         />
       </div>
 

@@ -1,27 +1,37 @@
 export type ChatMessage = { role: "user" | "assistant"; content: string };
 
+export interface SseEvent {
+  type: string;
+  [key: string]: unknown;
+}
+
 type ConnectChatSseParams = {
   uid: string;
   conversationId: string;
   content: string;
+  agentMode?: "direct" | "plan-and-solve";
   onToken: (token: string) => void;
   onDone?: () => void;
   onError?: (error: Error) => void;
+  onEvent?: (event: SseEvent) => void;
 };
 
 /**
  * Connect to `/api/chat` SSE stream via EventSource.
- * The server sends `data: [DONE]` or `data: {"type":"token"|"error","content":...}`.
+ * The server sends `data: [DONE]` or `data: {"type":"token"|"error"|...,"content":...}`.
  */
 export function connectChatSse({
   uid,
   conversationId,
   content,
+  agentMode,
   onToken,
   onDone,
   onError,
+  onEvent,
 }: ConnectChatSseParams): { close: () => void } {
-  const url = `/api/chat?uid=${encodeURIComponent(uid)}&conversationId=${encodeURIComponent(conversationId)}&content=${encodeURIComponent(content)}`;
+  let url = `/api/chat?uid=${encodeURIComponent(uid)}&conversationId=${encodeURIComponent(conversationId)}&content=${encodeURIComponent(content)}`;
+  if (agentMode) url += `&agentMode=${encodeURIComponent(agentMode)}`;
   const es = new EventSource(url);
 
   let finished = false;
@@ -51,6 +61,12 @@ export function connectChatSse({
       if (parsed.type === "error" && typeof parsed.content === "string") {
         close();
         onError?.(new Error(parsed.content));
+        return;
+      }
+
+      // 结构化事件（plan_start、step_start、tool_call 等）
+      if (parsed.type) {
+        onEvent?.(parsed as SseEvent);
       }
     } catch (err) {
       close();

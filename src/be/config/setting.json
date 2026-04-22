@@ -3,5 +3,6 @@
   "summaryTriggerCount": 8,
   "personaUpdateHours": 4,
   "mindCardsDisplayCount": 4,
-  "mindCardsUpdateHours": 4
+  "mindCardsUpdateHours": 4,
+  "agentMode": "direct"
 }

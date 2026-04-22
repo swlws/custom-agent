@@ -11,18 +11,39 @@ import { abortChat } from "@/fe/apis/chat";
 
 export type { ConversationMeta };
 
+type AgentMode = "direct" | "plan-and-solve";
+
+const AGENT_MODE_KEY = "agent_mode";
+
+function loadAgentMode(): AgentMode {
+  if (typeof window === "undefined") return "direct";
+  const stored = localStorage.getItem(AGENT_MODE_KEY);
+  return stored === "plan-and-solve" ? "plan-and-solve" : "direct";
+}
+
+function saveAgentMode(mode: AgentMode) {
+  if (typeof window !== "undefined") localStorage.setItem(AGENT_MODE_KEY, mode);
+}
+
 export function useChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [conversationId, setConversationIdState] = useState<string>("");
   const [conversations, setConversations] = useState<ConversationMeta[]>([]);
+  const [agentMode, setAgentModeState] = useState<AgentMode>("direct");
   const sseRef = useRef<{ close: () => void } | null>(null);
 
   useEffect(() => {
     setConversationIdState(getConversationId());
+    setAgentModeState(loadAgentMode());
     return () => {
       sseRef.current?.close();
     };
+  }, []);
+
+  const setAgentMode = useCallback((mode: AgentMode) => {
+    setAgentModeState(mode);
+    saveAgentMode(mode);
   }, []);
 
   const loadConversationList = useCallback(async () => {
@@ -73,6 +94,7 @@ export function useChat() {
         uid: getUid(),
         conversationId: cid,
         content: text,
+        agentMode,
         onToken: (token) => {
           setMessages((prev) => {
             const updated = [...prev];
@@ -105,12 +127,14 @@ export function useChat() {
         },
       });
     },
-    [messages, loading, conversationId, loadConversationList],
+    [messages, loading, conversationId, agentMode, loadConversationList],
   );
 
   return {
     messages,
     loading,
+    agentMode,
+    setAgentMode,
     sendText,
     abort,
     newChat,

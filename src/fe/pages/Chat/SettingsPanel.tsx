@@ -21,6 +21,13 @@ const DEFAULT_FORM: AppSettings = {
   personaUpdateHours: 4,
   mindCardsDisplayCount: 4,
   mindCardsUpdateHours: 4,
+  agentMode: "direct",
+};
+
+const AGENT_MODE_OPTIONS: Array<"direct" | "plan-and-solve"> = ["direct", "plan-and-solve"];
+const AGENT_MODE_LABELS: Record<string, string> = {
+  direct: "直接输出",
+  "plan-and-solve": "规划后执行",
 };
 
 const HOUR_OPTIONS = [1, 2, 4, 8, 12, 24];
@@ -79,6 +86,22 @@ export function SettingsPanel({ isOpen, onClose, onSave }: SettingsPanelProps) {
   return (
     <Dialog isOpen={isOpen} onClose={onClose} title="设置" footer={footer}>
       <div className="divide-y divide-gray-100 px-5 dark:divide-[#3f3f46]">
+          <FormRow
+            label="智能体模式"
+            hint={
+              form.agentMode === "direct"
+                ? "直接生成回答，响应更快"
+                : "先规划执行步骤，再逐步完成，适合复杂任务"
+            }
+          >
+            <Select
+              value={form.agentMode}
+              options={AGENT_MODE_OPTIONS}
+              onChange={(v) => set("agentMode", v)}
+              format={(v) => AGENT_MODE_LABELS[v] ?? v}
+            />
+          </FormRow>
+
           <FormRow
             label="消息存储上限"
             hint={`会话最多保留 ${form.maxMessagesCount} 条消息，超出后从头部截断`}

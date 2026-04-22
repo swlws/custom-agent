@@ -12,6 +12,8 @@ export interface AppSettings {
   mindCardsDisplayCount: number;
   /** 心智卡片更新间隔（小时） */
   mindCardsUpdateHours: number;
+  /** 智能体执行模式：direct = 直接输出，plan-and-solve = 规划后逐步执行 */
+  agentMode: "direct" | "plan-and-solve";
 }
 
 const DEFAULT_CONFIG_PATH = path.join(
@@ -35,6 +37,7 @@ export async function loadDefaultSettings(): Promise<AppSettings> {
       personaUpdateHours: 4,
       mindCardsDisplayCount: 4,
       mindCardsUpdateHours: 4,
+      agentMode: "direct",
     };
     return _defaultCache;
   }
