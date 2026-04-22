@@ -14,7 +14,8 @@ export interface ToolResult {
   isError: boolean;
 }
 
-const registry: Tool[] = [imageGenerateTool, webSearchTool];
+// const registry: Tool[] = [imageGenerateTool, webSearchTool];
+const registry: Tool[] = [imageGenerateTool];
 
 export function getToolRegistry(): Tool[] {
   return registry;
