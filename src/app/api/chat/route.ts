@@ -2,12 +2,19 @@ import { NextRequest } from "next/server";
 import { createChatSseResponse } from "@/be/services/chatSseService";
 import type { AgentMode } from "@/be/config/settings";
 
-const VALID_MODES = new Set<AgentMode>(["direct", "plan-and-solve", "react"]);
+const VALID_MODES = new Set<AgentMode>([
+  "direct",
+  "plan-and-solve",
+  "react",
+  "image-gen",
+]);
 
 function parseAgentMode(value: string | null): AgentMode | undefined {
-  return value && VALID_MODES.has(value as AgentMode)
-    ? (value as AgentMode)
-    : undefined;
+  if (value && VALID_MODES.has(value as AgentMode)) {
+    return value as AgentMode;
+  }
+
+  throw new Error("Invalid Agent Mode");
 }
 
 export const runtime = "nodejs";
@@ -37,6 +44,7 @@ export async function GET(req: NextRequest) {
   const uid = url.searchParams.get("uid") ?? "anonymous";
   const conversationId = url.searchParams.get("conversationId") ?? "default";
   const content = url.searchParams.get("content");
+  const agentMode = url.searchParams.get("agentMode");
 
   if (!content?.trim()) {
     return new Response("content is required", { status: 400 });
@@ -46,6 +54,6 @@ export async function GET(req: NextRequest) {
     uid,
     conversationId,
     content,
-    parseAgentMode(url.searchParams.get("agentMode")),
+    parseAgentMode(agentMode),
   );
 }

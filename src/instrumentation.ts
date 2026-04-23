@@ -13,9 +13,9 @@ export async function register() {
   await mcpManager.initialize();
   registerTools(mcpManager.getTools());
 
-  // 进程退出时断开所有 MCP 连接（动态引用 process，避免 Edge 打包器静态报错）
+  // 进程退出时断开所有 MCP 连接（通过 globalThis 括号访问，绕过 Edge 打包器静态分析）
   const dispose = () => void mcpManager.dispose();
-  const proc = await import("node:process");
-  proc.default.once("SIGTERM", dispose);
-  proc.default.once("SIGINT", dispose);
+  const proc = (globalThis as Record<string, unknown>)["process"] as NodeJS.Process | undefined;
+  proc?.once("SIGTERM", dispose);
+  proc?.once("SIGINT", dispose);
 }

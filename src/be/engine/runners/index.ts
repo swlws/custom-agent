@@ -3,6 +3,7 @@ import type { SseEvent } from "./plan-and-solve/solver";
 import { directRunner } from "./direct";
 import { planAndSolveRunner } from "./plan-and-solve";
 import { reactRunner } from "./react";
+import { imageGenRunner } from "./image-gen";
 
 export type { SseEvent };
 
@@ -25,6 +26,7 @@ export interface ModeRunner {
 
 export const modeRunners = new Map<string, ModeRunner>([
   ["direct", directRunner],
+  ["image-gen", imageGenRunner],
   ["plan-and-solve", planAndSolveRunner],
   ["react", reactRunner],
 ]);

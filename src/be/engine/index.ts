@@ -13,7 +13,11 @@ import {
   loadUserSettings,
   ConversationData,
 } from "@/be/session";
-import { loadDefaultSettings, mergeSettings, type AgentMode } from "@/be/config/settings";
+import {
+  loadDefaultSettings,
+  mergeSettings,
+  type AgentMode,
+} from "@/be/config/settings";
 import { modeRunners, type SseEvent } from "./runners";
 
 export type { SseEvent };
@@ -48,7 +52,9 @@ export class QueryEngine {
       const contextMessages = buildContextMessages(conv, content);
 
       const mode = params.agentMode ?? settings.agentMode;
+      console.log("==== ", params.agentMode, settings.agentMode);
       const runner = modeRunners.get(mode) ?? modeRunners.get("direct")!;
+      console.log(runner);
 
       const fullAssistantReply = await runner.execute(
         content,
