@@ -33,17 +33,6 @@ export interface Memory {
   content: string;
 }
 
-export interface PersonaTrait {
-  dimension: string;
-  value: string;
-}
-
-export interface Persona {
-  summary: string;
-  traits: PersonaTrait[];
-  updatedAt: string;
-}
-
 export interface MindCard {
   title: string;
   desc: string;
@@ -67,11 +56,6 @@ export interface ConversationMeta {
   conversationId: string;
   title: string;
   createdAt: string;
-  updatedAt: string;
-}
-
-export interface PersonaData {
-  persona: Persona | null;
   updatedAt: string;
 }
 
@@ -144,24 +128,6 @@ export async function listConversations(uid: string): Promise<ConversationMeta[]
   } catch {
     return [];
   }
-}
-
-// ─── Persona ────────────────────────────────────────────────────────────────
-
-export async function loadPersonaData(uid: string): Promise<PersonaData> {
-  const file = path.join(userDir(uid), "persona.json");
-  try {
-    const raw = await fs.readFile(file, "utf-8");
-    return JSON.parse(raw) as PersonaData;
-  } catch {
-    return { persona: null, updatedAt: new Date(0).toISOString() };
-  }
-}
-
-export async function savePersonaData(uid: string, data: PersonaData): Promise<void> {
-  await ensureUserDir(uid);
-  const file = path.join(userDir(uid), "persona.json");
-  await lockedWrite(file, JSON.stringify(data, null, 2));
 }
 
 // ─── MindCards ──────────────────────────────────────────────────────────────

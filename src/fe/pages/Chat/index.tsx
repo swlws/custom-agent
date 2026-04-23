@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useChat } from "./useChat";
 import { MessageList } from "./MessageList";
 import { InputBar } from "./InputBar";
-import { PersonaPanel } from "./PersonaPanel";
 import { ConversationList } from "./ConversationList";
 import { SettingsPanel } from "./SettingsPanel";
 import { ChatHeader } from "./ChatHeader";
@@ -24,7 +23,6 @@ export default function Chat() {
     setAgentMode,
   } = useChat();
 
-  const [personaOpen, setPersonaOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
@@ -46,7 +44,6 @@ export default function Chat() {
         currentId={conversationId}
         onSelect={switchConversation}
         onNewChat={handleNewChat}
-        onOpenPersona={() => setPersonaOpen(true)}
         onOpenSettings={() => setSettingsOpen(true)}
       />
 
@@ -72,10 +69,6 @@ export default function Chat() {
         />
       </div>
 
-      <PersonaPanel
-        isOpen={personaOpen}
-        onClose={() => setPersonaOpen(false)}
-      />
       <SettingsPanel
         isOpen={settingsOpen}
         onClose={() => setSettingsOpen(false)}

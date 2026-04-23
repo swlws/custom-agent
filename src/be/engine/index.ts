@@ -3,14 +3,11 @@ import {
   appendMessages,
   trimMessages,
   maybeUpdateSummary,
-  refreshPersona,
   refreshMindCards,
 } from "@/be/memory";
 import {
   loadConversation,
   saveConversation,
-  loadPersonaData,
-  savePersonaData,
   loadMindCardsData,
   saveMindCardsData,
   loadUserSettings,
@@ -75,7 +72,6 @@ export class QueryEngine {
       await this._updateGlobalKnowledge(
         uid,
         conv,
-        settings.personaUpdateHours,
         settings.mindCardsUpdateHours,
       );
     } catch (err) {
@@ -110,22 +106,11 @@ export class QueryEngine {
   private async _updateGlobalKnowledge(
     uid: string,
     conv: ConversationData,
-    personaUpdateHours: number,
     mindCardsUpdateHours: number,
   ) {
-    const personaData = await loadPersonaData(uid);
-    const newPersonaData = await refreshPersona(
-      uid,
-      conv,
-      personaData,
-      personaUpdateHours,
-    );
-    await savePersonaData(uid, newPersonaData);
-
     const mindCardsData = await loadMindCardsData(uid);
     const newMindCardsData = await refreshMindCards(
       conv,
-      newPersonaData.persona,
       mindCardsData,
       mindCardsUpdateHours,
     );

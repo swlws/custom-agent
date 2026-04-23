@@ -2,7 +2,6 @@ import type { ConversationMeta } from "./useChat";
 import { NavIconButton } from "@/fe/components/NavIconButton";
 import {
   NewChatIcon,
-  PersonaIcon,
   SettingsIcon,
 } from "@/fe/components/icons";
 
@@ -12,7 +11,6 @@ interface ConversationListProps {
   currentId: string;
   onSelect: (id: string) => void;
   onNewChat: () => void;
-  onOpenPersona: () => void;
   onOpenSettings: () => void;
 }
 
@@ -39,7 +37,6 @@ export function ConversationList({
   currentId,
   onSelect,
   onNewChat,
-  onOpenPersona,
   onOpenSettings,
 }: ConversationListProps) {
   return (
@@ -56,15 +53,6 @@ export function ConversationList({
           title="新对话"
           icon={<NewChatIcon />}
           label="新对话"
-          showLabel={open}
-        />
-
-        {/* 人物画像按钮 */}
-        <NavIconButton
-          onClick={onOpenPersona}
-          title="人物画像"
-          icon={<PersonaIcon />}
-          label="人物画像"
           showLabel={open}
         />
       </div>

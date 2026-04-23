@@ -19,7 +19,6 @@ interface SettingsPanelProps {
 const DEFAULT_FORM: AppSettings = {
   maxMessagesCount: 100,
   summaryTriggerCount: 8,
-  personaUpdateHours: 4,
   mindCardsDisplayCount: 4,
   mindCardsUpdateHours: 4,
   agentMode: "direct",
@@ -127,18 +126,6 @@ export function SettingsPanel({ isOpen, onClose, onSave }: SettingsPanelProps) {
               options={SUMMARY_TRIGGER_OPTIONS}
               onChange={(v) => set("summaryTriggerCount", v)}
               format={(v) => `${v} 条`}
-            />
-          </FormRow>
-
-          <FormRow
-            label="人物画像更新频率"
-            hint="距上次更新超过此时长后，下次对话时自动刷新"
-          >
-            <Select
-              value={form.personaUpdateHours}
-              options={HOUR_OPTIONS}
-              onChange={(v) => set("personaUpdateHours", v)}
-              format={(v) => `${v} 小时`}
             />
           </FormRow>
 

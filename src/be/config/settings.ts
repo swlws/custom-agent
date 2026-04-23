@@ -8,8 +8,6 @@ export interface AppSettings {
   maxMessagesCount: number;
   /** 每新增多少条消息触发一次历史摘要重新生成（须为偶数，2 条 = 1 次对话） */
   summaryTriggerCount: number;
-  /** 人物画像更新间隔（小时） */
-  personaUpdateHours: number;
   /** 默认展示的心智卡片数量，2 的倍数，最多 16 */
   mindCardsDisplayCount: number;
   /** 心智卡片更新间隔（小时） */
@@ -36,7 +34,6 @@ export async function loadDefaultSettings(): Promise<AppSettings> {
     _defaultCache = {
       maxMessagesCount: 100,
       summaryTriggerCount: 8,
-      personaUpdateHours: 4,
       mindCardsDisplayCount: 4,
       mindCardsUpdateHours: 4,
       agentMode: "direct",
