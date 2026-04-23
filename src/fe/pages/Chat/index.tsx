@@ -15,6 +15,7 @@ export default function Chat() {
     sendText,
     abort,
     newChat,
+    deleteConversation,
     conversations,
     loadConversationList,
     switchConversation,
@@ -44,6 +45,7 @@ export default function Chat() {
         currentId={conversationId}
         onSelect={switchConversation}
         onNewChat={handleNewChat}
+        onDeleteConversation={deleteConversation}
         onOpenSettings={() => setSettingsOpen(true)}
       />
 

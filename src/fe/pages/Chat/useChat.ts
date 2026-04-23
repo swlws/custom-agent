@@ -6,7 +6,7 @@ import {
   createNewConversationId,
   setConversationId,
 } from "@/fe/lib/uid";
-import { getConversations, getMemory, type ConversationMeta } from "@/fe/apis/conversations";
+import { getConversations, getMemory, deleteConversation as apiDeleteConversation, type ConversationMeta } from "@/fe/apis/conversations";
 import { abortChat } from "@/fe/apis/chat";
 import type { AgentMode } from "@/fe/apis/settings";
 
@@ -61,6 +61,20 @@ export function useChat() {
     const cached = await getMemory(cid);
     setMessages(cached);
   }, []);
+
+  const deleteConversation = useCallback(async (cid: string) => {
+    await apiDeleteConversation(cid);
+    // 若删除的是当前会话，切换到新对话
+    if (cid === conversationId) {
+      sseRef.current?.close();
+      sseRef.current = null;
+      const newCid = createNewConversationId();
+      setConversationIdState(newCid);
+      setMessages([]);
+      setLoading(false);
+    }
+    await loadConversationList();
+  }, [conversationId, loadConversationList]);
 
   const newChat = useCallback(() => {
     sseRef.current?.close();
@@ -138,6 +152,7 @@ export function useChat() {
     sendText,
     abort,
     newChat,
+    deleteConversation,
     conversations,
     loadConversationList,
     switchConversation,

@@ -1,6 +1,7 @@
+import { useState } from "react";
 import type { ConversationMeta } from "./useChat";
 import { NavIconButton } from "@/fe/components/NavIconButton";
-import { NewChatIcon, SettingsIcon } from "@/fe/components/icons";
+import { NewChatIcon, SettingsIcon, TrashIcon } from "@/fe/components/icons";
 
 interface ConversationListProps {
   open: boolean;
@@ -8,6 +9,7 @@ interface ConversationListProps {
   currentId: string;
   onSelect: (id: string) => void;
   onNewChat: () => void;
+  onDeleteConversation: (id: string) => void;
   onOpenSettings: () => void;
 }
 
@@ -34,8 +36,11 @@ export function ConversationList({
   currentId,
   onSelect,
   onNewChat,
+  onDeleteConversation,
   onOpenSettings,
 }: ConversationListProps) {
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+
   return (
     <div
       className={`flex h-full flex-shrink-0 flex-col bg-[#f9f9f9] transition-all duration-200 ease-in-out dark:bg-[#171717] ${
@@ -44,7 +49,6 @@ export function ConversationList({
     >
       {/* 上方功能按钮区 */}
       <div className="flex flex-col gap-1 px-2 py-3">
-        {/* 新建对话按钮 */}
         <NavIconButton
           onClick={onNewChat}
           title="新对话"
@@ -64,23 +68,47 @@ export function ConversationList({
               </p>
             ) : (
               conversations.map((conv) => (
-                <button
+                <div
                   key={conv.conversationId}
-                  onClick={() => onSelect(conv.conversationId)}
-                  title={conv.title || "新对话"}
-                  className={`w-full px-3 py-2.5 text-left transition-colors ${
+                  className={`group relative flex items-center transition-colors ${
                     conv.conversationId === currentId
-                      ? "bg-gray-200 text-gray-900 dark:bg-[#2f2f2f] dark:text-gray-100"
-                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-[#212121] dark:hover:text-gray-100"
+                      ? "bg-gray-200 dark:bg-[#2f2f2f]"
+                      : "hover:bg-gray-100 dark:hover:bg-[#212121]"
                   }`}
+                  onMouseEnter={() => setHoveredId(conv.conversationId)}
+                  onMouseLeave={() => setHoveredId(null)}
                 >
-                  <p className="truncate text-[13px] leading-5">
-                    {conv.title || "新对话"}
-                  </p>
-                  <p className="mt-0.5 text-[11px] text-gray-400 dark:text-gray-500">
-                    {formatDate(conv.updatedAt)}
-                  </p>
-                </button>
+                  <button
+                    onClick={() => onSelect(conv.conversationId)}
+                    title={conv.title || "新对话"}
+                    className={`min-w-0 flex-1 px-3 py-2.5 text-left ${
+                      conv.conversationId === currentId
+                        ? "text-gray-900 dark:text-gray-100"
+                        : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+                    }`}
+                  >
+                    <p className="truncate text-[13px] leading-5">
+                      {conv.title || "新对话"}
+                    </p>
+                    <p className="mt-0.5 text-[11px] text-gray-400 dark:text-gray-500">
+                      {formatDate(conv.updatedAt)}
+                    </p>
+                  </button>
+
+                  {/* 删除按钮：hover 时显示 */}
+                  {hoveredId === conv.conversationId && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDeleteConversation(conv.conversationId);
+                      }}
+                      title="删除会话"
+                      className="mr-2 flex-shrink-0 rounded p-1 text-gray-400 hover:bg-gray-200 hover:text-red-500 dark:hover:bg-[#3a3a3a] dark:hover:text-red-400"
+                    >
+                      <TrashIcon />
+                    </button>
+                  )}
+                </div>
               ))
             )}
           </>
@@ -89,7 +117,6 @@ export function ConversationList({
 
       {/* 下方工具按钮区 */}
       <div className="flex h-[66px] flex-col justify-center gap-1 border-t border-gray-200 px-2 dark:border-[#2f2f2f]">
-        {/* 设置按钮 */}
         <NavIconButton
           onClick={onOpenSettings}
           title="设置"

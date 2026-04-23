@@ -15,3 +15,10 @@ export function getConversations(): Promise<ConversationMeta[]> {
 export function getMemory(conversationId: string): Promise<ChatMessage[]> {
   return httpRequest("/api/memory", { params: { conversationId } });
 }
+
+export function deleteConversation(conversationId: string): Promise<{ ok: boolean }> {
+  return httpRequest("/api/conversations", {
+    method: "DELETE",
+    body: { conversationId },
+  });
+}

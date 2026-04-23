@@ -130,6 +130,11 @@ export async function listConversations(uid: string): Promise<ConversationMeta[]
   }
 }
 
+export async function deleteConversation(uid: string, conversationId: string): Promise<void> {
+  const file = path.join(conversationDir(uid), `${conversationId}.json`);
+  await fs.rm(file, { force: true });
+}
+
 // ─── MindCards ──────────────────────────────────────────────────────────────
 
 export async function loadMindCardsData(uid: string): Promise<MindCardsData> {
