@@ -1,0 +1,28 @@
+src/fe/pages/Chat/MessageItem.tsx
+  c7564aad040757d8 1,5,20-27,31,38,47-60
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.2",
+  "base_commit_sha": "05c81a46ffcd9c3cca2f6366c0cbf7e13e44d6ca",
+  "prompts": {
+    "c7564aad040757d8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5900ef86-4691-48c8-992d-b6a5bb6c89a0",
+        "model": "mcs-5"
+      },
+      "human_author": "swlws",
+      "messages": [],
+      "total_additions": 26,
+      "total_deletions": 4,
+      "accepted_lines": 26,
+      "overriden_lines": 0
+    }
+  },
+  "humans": {
+    "h_9054b55ea37caa": {
+      "author": "swlws"
+    }
+  }
+}
