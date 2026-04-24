@@ -1,0 +1,60 @@
+src/be/engine/runners/plan-and-solve/planner.ts
+  h_9054b55ea37caa 64,71
+  5c89680608c2a78a 2,24,61-63,65
+src/fe/components/ImageCard/index.tsx
+  5c89680608c2a78a 1-15
+src/be/services/chatSseService.ts
+  5c89680608c2a78a 3,27
+src/be/engine/index.ts
+  5c89680608c2a78a 21,23,34,46,59,81
+src/be/engine/runners/plan-and-solve/solver.ts
+  5c89680608c2a78a 5,31,35,79,131-137,147
+src/fe/components/ErrorCard/index.tsx
+  5c89680608c2a78a 1-12
+src/be/engine/runners/index.ts
+  5c89680608c2a78a 7-12,15
+src/be/engine/runners/react/index.ts
+  5c89680608c2a78a 3,29,99-102,136-148
+  h_9054b55ea37caa 97-98
+src/fe/lib/chatSseClient.ts
+  5c89680608c2a78a 3-8,10-12,15-18,24,63,66,76
+src/fe/components/CotCard/index.tsx
+  5c89680608c2a78a 1-52
+src/be/engine/runners/plan-and-solve/index.ts
+  5c89680608c2a78a 6
+src/be/engine/tools/index.ts
+  5c89680608c2a78a 15,70-71
+src/fe/pages/Chat/useChat.ts
+  5c89680608c2a78a 2,103,112,116-124,126-127,141-142,144-145
+src/be/engine/runners/text.ts
+  5c89680608c2a78a 2,9
+src/be/engine/runners/image-gen.ts
+  5c89680608c2a78a 2,6,12,16-17
+src/fe/pages/Chat/MessageItem.tsx
+  5c89680608c2a78a 3-5,7,22-34,38,42-45,66-89
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.2",
+  "base_commit_sha": "4162dc85509be83a653a50c31a3e70f4bc55a83e",
+  "prompts": {
+    "5c89680608c2a78a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f68ba097-5aa4-41f6-9e0d-a41e01a00441",
+        "model": "mcs-5"
+      },
+      "human_author": "swlws",
+      "messages": [],
+      "total_additions": 259,
+      "total_deletions": 132,
+      "accepted_lines": 225,
+      "overriden_lines": 1
+    }
+  },
+  "humans": {
+    "h_9054b55ea37caa": {
+      "author": "swlws"
+    }
+  }
+}
