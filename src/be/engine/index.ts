@@ -18,9 +18,9 @@ import {
   mergeSettings,
   type AgentMode,
 } from "@/be/config/settings";
-import { modeRunners, type SseEvent } from "./runners";
+import { modeRunners, type CardType } from "./runners";
 
-export type { SseEvent };
+export type { CardType };
 
 export interface QueryParams {
   uid: string;
@@ -31,10 +31,9 @@ export interface QueryParams {
 }
 
 export interface QueryHandlers {
-  onToken: (token: string) => void;
+  onToken: (cardType: CardType, token: string) => void;
   onDone: () => void;
   onError: (error: Error) => void;
-  onEvent?: (event: SseEvent) => void;
 }
 
 export class QueryEngine {
@@ -44,7 +43,7 @@ export class QueryEngine {
     signal?: AbortSignal,
   ): Promise<void> {
     const { uid, conversationId, content } = params;
-    const { onToken, onDone, onError, onEvent = () => {} } = handlers;
+    const { onToken, onDone, onError } = handlers;
 
     try {
       const settings = await this._loadSettings(uid);
@@ -57,7 +56,7 @@ export class QueryEngine {
       const fullAssistantReply = await runner.execute(
         content,
         contextMessages,
-        { onToken, onDone, onError, onEvent },
+        { onToken, onDone, onError },
         signal,
       );
 
@@ -79,7 +78,7 @@ export class QueryEngine {
         settings.mindCardsUpdateHours,
       );
     } catch (err) {
-      if (err instanceof Error && err.name === "AbortError") return;
+      if (err instanceof Error && (err.name === "AbortError" || err.name === "APIUserAbortError" || signal?.aborted)) return;
       onError(err instanceof Error ? err : new Error("Unknown error"));
     }
   }

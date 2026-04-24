@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import { getToolDefinitions, executeTool } from "@/be/engine/tools";
-import type { ModeRunner } from "@/be/engine/runners";
+import { CardType, type ModeRunner } from "@/be/engine/runners";
 
 /** Token 预算：累计消耗超过此值时，完成当前迭代后优雅退出（软约束） */
 const TOKEN_BUDGET = 32_000;
@@ -26,7 +26,7 @@ function resolveModel(): string {
  * 3. 错误透传：工具失败时将错误内容回传给 LLM，由模型决策是否重试
  */
 export const reactRunner: ModeRunner = {
-  async execute(_content, contextMessages, { onToken, onEvent }, signal) {
+  async execute(_content, contextMessages, { onToken }, signal) {
     const client = createClient();
     const model = resolveModel();
     const toolDefinitions = getToolDefinitions();
@@ -68,7 +68,6 @@ export const reactRunner: ModeRunner = {
         if (delta.content) {
           stepText += delta.content;
           fullReply += delta.content;
-          onToken(delta.content);
         }
 
         if (delta.tool_calls) {
@@ -95,8 +94,12 @@ export const reactRunner: ModeRunner = {
         function: { name: chunk.name, arguments: chunk.arguments },
       }));
 
-      // 无工具调用 → LLM 已给出最终答案，结束循环
-      if (toolCalls.length === 0) break;
+      onToken(CardType.Markdown, stepText);
+
+      // 无工具调用 → LLM 已给出最终答案
+      if (toolCalls.length === 0) {
+        break;
+      }
 
       // 将 assistant 消息（含 tool_calls）加入历史
       messages = [
@@ -122,14 +125,7 @@ export const reactRunner: ModeRunner = {
             }
           })();
 
-          onEvent({ type: "tool_call", name: tc.function.name, args });
           const result = await executeTool(tc.function.name, args, signal);
-          onEvent({
-            type: "tool_result",
-            name: tc.function.name,
-            result: result.content,
-            isError: result.isError,
-          });
 
           return { tc, result };
         }),
@@ -137,15 +133,19 @@ export const reactRunner: ModeRunner = {
 
       // 按顺序推流 Observation 并追加消息历史
       for (const { tc, result } of toolResults) {
-        const observationBlock =
-          "\n\n> **Observation（" +
-          tc.function.name +
-          "）**\n> " +
-          result.content.split("\n").join("\n> ") +
-          "\n\n";
+        if (result.isImage) {
+          onToken(CardType.Image, result.content);
+        } else {
+          const observationBlock =
+            "\n\n> **Observation（" +
+            tc.function.name +
+            "）**\n> " +
+            result.content.split("\n").join("\n> ") +
+            "\n\n";
 
-        fullReply += observationBlock;
-        onToken(observationBlock);
+          fullReply += observationBlock;
+          onToken(CardType.Cot, observationBlock);
+        }
 
         messages.push({
           role: "tool",

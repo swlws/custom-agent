@@ -2,11 +2,7 @@ import OpenAI from "openai";
 import { Message } from "@/be/lib/text-llm";
 import { getToolDefinitions, executeTool } from "@/be/engine/tools";
 import type { PlanStep } from "./planner";
-
-export interface SseEvent {
-  type: string;
-  [key: string]: unknown;
-}
+import { CardType } from "@/be/engine/runners";
 
 const MAX_TOOL_ITERATIONS = 3;
 
@@ -32,12 +28,11 @@ export async function solveStep(
   originalQuery: string,
   contextMessages: Message[],
   previousResults: string[],
-  onToken: (token: string) => void,
-  onEvent: (event: SseEvent) => void,
+  onToken: (cardType: CardType, token: string) => void,
   signal?: AbortSignal,
 ): Promise<string> {
   const stepHeader = `## 🔍 步骤 ${step.index + 1}：${step.title}\n\n`;
-  onToken(stepHeader);
+  onToken(CardType.Markdown, stepHeader);
 
   const messages = buildStepMessages(
     step,
@@ -81,7 +76,7 @@ export async function solveStep(
       if (delta.content) {
         stepText += delta.content;
         fullOutput += delta.content;
-        onToken(delta.content);
+        onToken(CardType.Markdown, delta.content);
       }
 
       if (delta.tool_calls) {
@@ -125,9 +120,7 @@ export async function solveStep(
           }
         })();
 
-        onEvent({ type: "tool_call", name: tc.function.name, args });
         const result = await executeTool(tc.function.name, args, signal);
-        onEvent({ type: "tool_result", name: tc.function.name, result: result.content, isError: result.isError });
 
         return { tc, result };
       }),
@@ -135,9 +128,13 @@ export async function solveStep(
 
     // 按顺序推流 Observation 并追加消息历史
     for (const { tc, result } of toolResults) {
-      const resultBlock = `\n\n> **工具：${tc.function.name}**\n> ${result.content.split("\n").join("\n> ")}\n\n`;
-      fullOutput += resultBlock;
-      onToken(resultBlock);
+      if (result.isImage) {
+        onToken(CardType.Image, result.content);
+      } else {
+        const resultBlock = `\n\n> **工具：${tc.function.name}**\n> ${result.content.split("\n").join("\n> ")}\n\n`;
+        fullOutput += resultBlock;
+        onToken(CardType.Markdown, resultBlock);
+      }
 
       currentMessages.push({
         role: "tool",
@@ -147,7 +144,7 @@ export async function solveStep(
     }
   }
 
-  onToken("\n\n");
+  onToken(CardType.Markdown, "\n\n");
   fullOutput += "\n\n";
 
   return fullOutput;

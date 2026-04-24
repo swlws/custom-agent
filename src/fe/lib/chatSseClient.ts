@@ -1,21 +1,29 @@
 import type { AgentMode } from "@/fe/apis/settings";
 
-export type ChatMessage = { role: "user" | "assistant"; content: string };
-
-export interface SseEvent {
-  type: string;
-  [key: string]: unknown;
+export const enum CardType {
+  Markdown = 1,
+  Cot = 2,
+  Error = 3,
+  Image = 4,
 }
+
+export interface MessageCard {
+  cardType: CardType;
+  content: string;
+}
+
+export type ChatMessage =
+  | { role: "user"; content: string }
+  | { role: "assistant"; content: string; cards: MessageCard[] };
 
 type ConnectChatSseParams = {
   uid: string;
   conversationId: string;
   content: string;
   agentMode?: AgentMode;
-  onToken: (token: string) => void;
+  onToken: (cardType: CardType, token: string) => void;
   onDone?: () => void;
   onError?: (error: Error) => void;
-  onEvent?: (event: SseEvent) => void;
 };
 
 /**
@@ -30,7 +38,6 @@ export function connectChatSse({
   onToken,
   onDone,
   onError,
-  onEvent,
 }: ConnectChatSseParams): { close: () => void } {
   let url = `/api/chat?uid=${encodeURIComponent(uid)}&conversationId=${encodeURIComponent(conversationId)}&content=${encodeURIComponent(content)}`;
   if (agentMode) url += `&agentMode=${encodeURIComponent(agentMode)}`;
@@ -53,10 +60,10 @@ export function connectChatSse({
     }
 
     try {
-      const parsed = JSON.parse(payload) as { type?: string; content?: string };
+      const parsed = JSON.parse(payload) as { type?: string; cardType?: CardType; content?: string };
 
       if (parsed.type === "token" && typeof parsed.content === "string") {
-        onToken(parsed.content);
+        onToken(parsed.cardType ?? CardType.Markdown, parsed.content);
         return;
       }
 
@@ -66,10 +73,7 @@ export function connectChatSse({
         return;
       }
 
-      // 结构化事件（plan_start、step_start、tool_call 等）
-      if (parsed.type) {
-        onEvent?.(parsed as SseEvent);
-      }
+      // 未知 type，忽略
     } catch (err) {
       close();
       onError?.(err instanceof Error ? err : new Error("Request failed"));

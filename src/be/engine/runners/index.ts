@@ -1,17 +1,20 @@
 import type { Message } from "@/be/lib/text-llm";
-import type { SseEvent } from "./plan-and-solve/solver";
 import { textRunner } from "./text";
 import { planAndSolveRunner } from "./plan-and-solve";
 import { reactRunner } from "./react";
 import { imageGenRunner } from "./image-gen";
 
-export type { SseEvent };
+export const enum CardType {
+  Markdown = 1,
+  Cot = 2,
+  Error = 3,
+  Image = 4,
+}
 
 export interface RunnerHandlers {
-  onToken: (token: string) => void;
+  onToken: (cardType: CardType, token: string) => void;
   onDone: () => void;
   onError: (error: Error) => void;
-  onEvent: (event: SseEvent) => void;
 }
 
 /** 每种模式实现此接口，返回完整的 assistant 输出文本 */

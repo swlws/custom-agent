@@ -1,7 +1,10 @@
 import { memo, useState, useCallback } from "react";
 import MarkdownView from "@/fe/components/MarkdownView";
+import { CotCard } from "@/fe/components/CotCard";
+import { ErrorCard } from "@/fe/components/ErrorCard";
+import { ImageCard } from "@/fe/components/ImageCard";
 import { LoadingDots } from "@/fe/components/LoadingDots";
-import { ChatMessage } from "@/fe/lib/chatSseClient";
+import { ChatMessage, CardType } from "@/fe/lib/chatSseClient";
 import { CopySuccessIcon, CopyClipboardIcon } from "@/fe/components/icons";
 
 interface MessageItemProps {
@@ -16,15 +19,30 @@ export const MessageItem = memo(function MessageItem({
   loading,
 }: MessageItemProps) {
   const isUser = message.role === "user";
-  const showLoader = loading && isLast && !message.content;
+  const cards = message.role === "assistant" ? message.cards : undefined;
+  const hasContent = isUser
+    ? !!message.content
+    : (cards && cards.length > 0) || !!message.content;
+  const showLoader = loading && isLast && !hasContent;
+
+  // 复制内容：user 用 content，assistant 拼接所有卡片文本
+  const copyText = isUser
+    ? message.content
+    : cards
+      ? cards.map((c) => c.content).join("\n\n")
+      : message.content;
+
   const [copied, setCopied] = useState(false);
 
   const handleCopy = useCallback(() => {
-    navigator.clipboard.writeText(message.content.trim()).then(() => {
+    navigator.clipboard.writeText(copyText.trim()).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });
-  }, [message.content]);
+  }, [copyText]);
+
+  // 是否正在流式输出最后一张卡片
+  const isStreaming = loading && isLast;
 
   return (
     <div
@@ -45,8 +63,30 @@ export const MessageItem = memo(function MessageItem({
           <LoadingDots className="items-center gap-1 py-1" />
         ) : (
           <>
-            <MarkdownView content={message.content} />
-            {message.content && (
+            {isUser || !cards ? (
+              <MarkdownView content={message.content} />
+            ) : (
+              cards.map((card, idx) => {
+                const isLastCard = idx === cards.length - 1;
+                if (card.cardType === CardType.Cot) {
+                  return (
+                    <CotCard
+                      key={idx}
+                      content={card.content}
+                      streaming={isStreaming && isLastCard}
+                    />
+                  );
+                }
+                if (card.cardType === CardType.Error) {
+                  return <ErrorCard key={idx} message={card.content} />;
+                }
+                if (card.cardType === CardType.Image) {
+                  return <ImageCard key={idx} url={card.content} />;
+                }
+                return <MarkdownView key={idx} content={card.content} />;
+              })
+            )}
+            {hasContent && (
               <button
                 onClick={handleCopy}
                 title="复制"

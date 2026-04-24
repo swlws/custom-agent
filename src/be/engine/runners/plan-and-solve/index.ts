@@ -3,8 +3,7 @@ import { solveStep } from "./solver";
 import type { ModeRunner } from "@/be/engine/runners";
 
 export const planAndSolveRunner: ModeRunner = {
-  async execute(content, contextMessages, { onToken, onEvent }, signal) {
-    onEvent({ type: "plan_start" });
+  async execute(content, contextMessages, { onToken }, signal) {
     const steps = await generatePlan(content, contextMessages, onToken, signal);
 
     let reply = "";
@@ -13,8 +12,6 @@ export const planAndSolveRunner: ModeRunner = {
     for (const step of steps) {
       if (signal?.aborted) break;
 
-      onEvent({ type: "step_start", index: step.index, title: step.title });
-
       const stepOutput = await solveStep(
         step,
         steps,
@@ -22,14 +19,11 @@ export const planAndSolveRunner: ModeRunner = {
         contextMessages,
         previousResults,
         onToken,
-        onEvent,
         signal,
       );
 
       previousResults.push(stepOutput);
       reply += stepOutput;
-
-      onEvent({ type: "step_done", index: step.index });
     }
 
     return reply;

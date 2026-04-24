@@ -1,4 +1,5 @@
 import { chat, Message } from "@/be/lib/text-llm";
+import { CardType } from "@/be/engine/runners";
 
 export interface PlanStep {
   index: number;
@@ -20,7 +21,7 @@ const PLANNER_SYSTEM_PROMPT =
 export async function generatePlan(
   content: string,
   contextMessages: Message[],
-  onToken: (token: string) => void,
+  onToken: (cardType: CardType, token: string) => void,
   signal?: AbortSignal,
 ): Promise<PlanStep[]> {
   const planMessages: Message[] = [
@@ -57,18 +58,21 @@ export async function generatePlan(
   }));
 
   const planMarkdown = formatPlanMarkdown(planSteps);
-  await streamText(planMarkdown, onToken, signal);
+  await streamText(
+    planMarkdown,
+    (token) => onToken(CardType.Cot, token),
+    signal,
+  );
 
   return planSteps;
 }
 
 function formatPlanMarkdown(steps: PlanStep[]): string {
-  const lines: string[] = ["## 执行计划\n\n"];
+  const lines: string[] = [];
   for (const step of steps) {
     lines.push("**" + (step.index + 1) + ". " + step.title + "**\n");
     lines.push("   " + step.description + "\n\n");
   }
-  lines.push("---\n\n");
   return lines.join("");
 }
 

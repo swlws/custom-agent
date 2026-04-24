@@ -12,6 +12,7 @@ export interface Tool {
 export interface ToolResult {
   content: string;
   isError: boolean;
+  isImage?: boolean;
 }
 
 /** 静态工具（随进程启动固定注册） */
@@ -66,7 +67,8 @@ export async function executeTool(
 
   try {
     const content = await tool.execute(args, signal);
-    return { content, isError: false };
+    const isImage = tool.name === "image_generate";
+    return { content, isError: false, isImage };
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Unknown error";
     return { content: `[工具 ${name} 执行失败: ${msg}]`, isError: true };

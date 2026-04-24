@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { connectChatSse, ChatMessage } from "@/fe/lib/chatSseClient";
+import { connectChatSse, ChatMessage, CardType } from "@/fe/lib/chatSseClient";
 import {
   getUid,
   getConversationId,
@@ -100,7 +100,7 @@ export function useChat() {
       setLoading(true);
 
       const assistantIndex = messages.length + 1; // current messages + new user message
-      setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
+      setMessages((prev) => [...prev, { role: "assistant", content: "", cards: [] }]);
 
       const cid = conversationId;
       sseRef.current?.close();
@@ -109,16 +109,22 @@ export function useChat() {
         conversationId: cid,
         content: text,
         agentMode,
-        onToken: (token) => {
+        onToken: (cardType: CardType, token: string) => {
           setMessages((prev) => {
             const updated = [...prev];
             const assistantMsg = updated[assistantIndex];
-            if (assistantMsg) {
-              updated[assistantIndex] = {
-                ...assistantMsg,
-                content: assistantMsg.content + token,
-              };
+            if (!assistantMsg || assistantMsg.role !== "assistant") return prev;
+
+            const cards = [...assistantMsg.cards];
+            const last = cards[cards.length - 1];
+
+            if (!last || last.cardType !== cardType) {
+              cards.push({ cardType, content: token });
+            } else {
+              cards[cards.length - 1] = { ...last, content: last.content + token };
             }
+
+            updated[assistantIndex] = { ...assistantMsg, cards };
             return updated;
           });
         },
@@ -132,9 +138,11 @@ export function useChat() {
           setLoading(false);
           setMessages((prev) => {
             const updated = [...prev];
+            const assistantMsg = updated[assistantIndex];
+            if (!assistantMsg || assistantMsg.role !== "assistant") return prev;
             updated[assistantIndex] = {
-              role: "assistant",
-              content: `[error]: ${err.message}`,
+              ...assistantMsg,
+              cards: [...assistantMsg.cards, { cardType: CardType.Error, content: err.message }],
             };
             return updated;
           });
