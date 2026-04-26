@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CopyClipboardIcon, CopySuccessIcon } from "../icons";
+import { CopyClipboardIcon, CopySuccessIcon } from "../../components/icons";
 
 interface ImageCardProps {
   url: string;

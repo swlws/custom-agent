@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import MarkdownView from "@/fe/components/MarkdownView";
+import MarkdownView from "@/fe/cards/mardown-card";
 
 interface CotCardProps {
   content: string;
@@ -7,7 +7,7 @@ interface CotCardProps {
 }
 
 export function CotCard({ content, streaming = false }: CotCardProps) {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
   const prevStreamingRef = useRef(streaming);
 
   // 流式结束时自动折叠

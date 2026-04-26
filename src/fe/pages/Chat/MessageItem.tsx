@@ -1,8 +1,8 @@
 import { memo, useState, useCallback } from "react";
-import MarkdownView from "@/fe/components/MarkdownView";
-import { CotCard } from "@/fe/components/CotCard";
-import { ErrorCard } from "@/fe/components/ErrorCard";
-import { ImageCard } from "@/fe/components/ImageCard";
+import MarkdownView from "@/fe/cards/mardown-card";
+import { CotCard } from "@/fe/cards/cot-card";
+import { ErrorCard } from "@/fe/cards/error-card";
+import { ImageCard } from "@/fe/cards/image-card";
 import { LoadingDots } from "@/fe/components/LoadingDots";
 import { ChatMessage, CardType } from "@/fe/lib/chatSseClient";
 import { CopySuccessIcon, CopyClipboardIcon } from "@/fe/components/icons";
@@ -47,9 +47,7 @@ export const MessageItem = memo(function MessageItem({
   return (
     <div
       className={`group flex w-full ${
-        isUser
-          ? "justify-end"
-          : "justify-start rounded-2xl bg-gray-50 px-4 py-3 dark:bg-[#2f2f2f]"
+        isUser ? "justify-end" : "justify-start rounded-2xl px-4 py-3"
       }`}
     >
       <div
