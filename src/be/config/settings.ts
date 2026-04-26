@@ -1,7 +1,12 @@
 import fs from "fs/promises";
 import path from "path";
 
-export type AgentMode = "text" | "plan-and-solve" | "react" | "image-gen";
+export type AgentMode =
+  | "text"
+  | "plan-and-solve"
+  | "react"
+  | "image-gen"
+  | "reflection";
 
 export interface AppSettings {
   /** 会话消息存储上限（条），超出时从头部截断，不触发 LLM */

@@ -84,8 +84,9 @@ export const InputBar = memo(function InputBar({
               >
                 <option value="text">文本处理</option>
                 <option value="image-gen">生成图片</option>
-                <option value="plan-and-solve">PlanAndSolve</option>
                 <option value="react">ReAct</option>
+                <option value="plan-and-solve">PlanAndSolve</option>
+                <option value="reflection">Reflection</option>
               </select>
             </div>
 

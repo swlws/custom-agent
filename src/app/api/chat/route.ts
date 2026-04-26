@@ -7,6 +7,7 @@ const VALID_MODES = new Set<AgentMode>([
   "plan-and-solve",
   "react",
   "image-gen",
+  "reflection",
 ]);
 
 function parseAgentMode(value: string | null): AgentMode | undefined {
