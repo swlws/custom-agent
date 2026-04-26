@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import { getToolDefinitions, executeTool } from "@/be/engine/tools";
-import { CardType, type ModeRunner } from "@/be/engine/runners";
+import { CardType, type ModeRunner } from "@/be/engine/runners/type";
 
 /** Token 预算：累计消耗超过此值时，完成当前迭代后优雅退出（软约束） */
 const TOKEN_BUDGET = 32_000;

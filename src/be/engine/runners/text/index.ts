@@ -1,5 +1,5 @@
 import { chatStream } from "@/be/lib/text-llm";
-import { CardType, type ModeRunner } from "./index";
+import { CardType, type ModeRunner } from "../type";
 
 export const textRunner: ModeRunner = {
   async execute(_content, contextMessages, { onToken }, signal) {

@@ -1,7 +1,7 @@
 import { QueryEngine } from "@/be/engine";
 import type { AgentMode } from "@/be/config/settings";
-import type { CardType } from "@/be/engine/runners";import { registerAbort, releaseAbort } from "./abortRegistry";
-
+import type { CardType } from "@/be/engine/runners/type";
+import { registerAbort, releaseAbort } from "./abortRegistry";
 
 const engine = new QueryEngine();
 
@@ -24,9 +24,15 @@ function createSSEStream(
         await engine.run(
           { uid, conversationId, content, agentMode },
           {
-            onToken: (cardType: CardType, chunk: string) => sendEvent(JSON.stringify({ type: "token", cardType, content: chunk })),
-            onDone:  () => sendEvent("[DONE]"),
-            onError: (err) => sendEvent(JSON.stringify({ type: "error", content: err.message })),
+            onToken: (cardType: CardType, chunk: string) =>
+              sendEvent(
+                JSON.stringify({ type: "token", cardType, content: chunk }),
+              ),
+            onDone: () => sendEvent("[DONE]"),
+            onError: (err) =>
+              sendEvent(
+                JSON.stringify({ type: "error", content: err.message }),
+              ),
           },
           signal,
         );

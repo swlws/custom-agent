@@ -1,5 +1,5 @@
 import { generateImage } from "@/be/lib/image-gen";
-import { CardType, type ModeRunner } from "./index";
+import { CardType, type ModeRunner } from "../type";
 
 export const imageGenRunner: ModeRunner = {
   async execute(content, _contextMessages, { onToken }) {

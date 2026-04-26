@@ -2,7 +2,7 @@ import OpenAI from "openai";
 import { Message } from "@/be/lib/text-llm";
 import { getToolDefinitions, executeTool } from "@/be/engine/tools";
 import type { PlanStep } from "./planner";
-import { CardType } from "@/be/engine/runners";
+import { CardType } from "@/be/engine/runners/type";
 
 const MAX_TOOL_ITERATIONS = 3;
 
@@ -66,8 +66,15 @@ export async function solveStep(
     );
 
     let stepText = "";
-    const toolCalls: Array<{ id: string; type: "function"; function: { name: string; arguments: string } }> = [];
-    const toolCallChunks: Record<number, { id: string; name: string; arguments: string }> = {};
+    const toolCalls: Array<{
+      id: string;
+      type: "function";
+      function: { name: string; arguments: string };
+    }> = [];
+    const toolCallChunks: Record<
+      number,
+      { id: string; name: string; arguments: string }
+    > = {};
 
     for await (const chunk of response) {
       const delta = chunk.choices[0]?.delta;
@@ -86,7 +93,8 @@ export async function solveStep(
             toolCallChunks[idx] = { id: tc.id ?? "", name: "", arguments: "" };
           }
           if (tc.function?.name) toolCallChunks[idx].name += tc.function.name;
-          if (tc.function?.arguments) toolCallChunks[idx].arguments += tc.function.arguments;
+          if (tc.function?.arguments)
+            toolCallChunks[idx].arguments += tc.function.arguments;
           if (tc.id) toolCallChunks[idx].id = tc.id;
         }
       }
@@ -157,9 +165,10 @@ function buildStepMessages(
   contextMessages: Message[],
   previousResults: string[],
 ): OpenAI.Chat.ChatCompletionMessageParam[] {
-  const systemContent = contextMessages[0]?.role === "system"
-    ? (contextMessages[0].content as string)
-    : "";
+  const systemContent =
+    contextMessages[0]?.role === "system"
+      ? (contextMessages[0].content as string)
+      : "";
 
   const planSummary = allSteps
     .map((s) => `${s.index + 1}. ${s.title}：${s.description}`)
@@ -186,8 +195,15 @@ ${previousContext}
 请专注完成当前步骤，可使用工具辅助。输出应简洁有针对性。`;
 
   return [
-    { role: "system", content: systemContent ? `${systemContent}\n\n${stepInstruction}` : stepInstruction },
-    ...contextMessages.slice(1, -1).slice(-4) as OpenAI.Chat.ChatCompletionMessageParam[],
+    {
+      role: "system",
+      content: systemContent
+        ? `${systemContent}\n\n${stepInstruction}`
+        : stepInstruction,
+    },
+    ...(contextMessages
+      .slice(1, -1)
+      .slice(-4) as OpenAI.Chat.ChatCompletionMessageParam[]),
     { role: "user", content: stepInstruction },
   ];
 }

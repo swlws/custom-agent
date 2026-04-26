@@ -1,6 +1,6 @@
 import { generatePlan } from "./planner";
 import { solveStep } from "./solver";
-import type { ModeRunner } from "@/be/engine/runners";
+import type { ModeRunner } from "@/be/engine/runners/type";
 
 export const planAndSolveRunner: ModeRunner = {
   async execute(content, contextMessages, { onToken }, signal) {

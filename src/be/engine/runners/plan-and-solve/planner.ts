@@ -1,5 +1,5 @@
 import { chat, Message } from "@/be/lib/text-llm";
-import { CardType } from "@/be/engine/runners";
+import { CardType } from "@/be/engine/runners/type";
 
 export interface PlanStep {
   index: number;
