@@ -65,9 +65,14 @@ export const MessageList = memo(function MessageList({
       >
         {messages.length === 0 && (
           <div className="mx-auto w-full max-w-3xl">
-            <h1 className="mb-6 text-2xl font-semibold tracking-tight text-gray-800 dark:text-gray-200">
-              Hello World
-            </h1>
+            <div className="mb-10 flex flex-col items-center">
+              <h1 className="text-3xl font-bold tracking-tight text-gray-800 dark:text-gray-100">
+                swlws agent
+              </h1>
+              <p className="mt-2 text-gray-500 dark:text-gray-400">
+                你的智能助手，随时为你服务
+              </p>
+            </div>
             <MindCards onSelect={onCardSelect} />
           </div>
         )}
