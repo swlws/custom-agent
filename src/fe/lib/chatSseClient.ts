@@ -22,6 +22,7 @@ type ConnectChatSseParams = {
   conversationId: string;
   content: string;
   agentMode?: AgentMode;
+  deepThink?: boolean;
   onToken: (cardType: CardType, token: string) => void;
   onDone?: () => void;
   onError?: (error: Error) => void;
@@ -36,12 +37,14 @@ export function connectChatSse({
   conversationId,
   content,
   agentMode,
+  deepThink,
   onToken,
   onDone,
   onError,
 }: ConnectChatSseParams): { close: () => void } {
   let url = `/api/chat?uid=${encodeURIComponent(uid)}&conversationId=${encodeURIComponent(conversationId)}&content=${encodeURIComponent(content)}`;
   if (agentMode) url += `&agentMode=${encodeURIComponent(agentMode)}`;
+  if (deepThink) url += "&deepThink=true";
   const es = new EventSource(url);
 
   let finished = false;

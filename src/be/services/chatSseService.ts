@@ -10,6 +10,7 @@ function createSSEStream(
   conversationId: string,
   content: string,
   agentMode?: AgentMode,
+  deepThink?: boolean,
 ) {
   const signal = registerAbort(uid, conversationId);
   const encoder = new TextEncoder();
@@ -22,7 +23,7 @@ function createSSEStream(
 
       try {
         await engine.run(
-          { uid, conversationId, content, agentMode },
+          { uid, conversationId, content, agentMode, deepThink },
           {
             onToken: (cardType: CardType, chunk: string) =>
               sendEvent(
@@ -58,6 +59,7 @@ export function createChatSseResponse(
   conversationId: string,
   content: string,
   agentMode?: AgentMode,
+  deepThink?: boolean,
 ) {
-  return createSSEStream(uid, conversationId, content, agentMode);
+  return createSSEStream(uid, conversationId, content, agentMode, deepThink);
 }

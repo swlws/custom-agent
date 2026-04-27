@@ -22,6 +22,7 @@ import {
 import { type CardType } from "./runners/type";
 import { IntentParser } from "./intent";
 import { resolveRunner } from "./intent/resolver";
+import { applyDeepThinkPolicyPrompt } from "./prompts/deep-think-policy";
 
 export type { CardType };
 
@@ -31,6 +32,8 @@ export interface QueryParams {
   content: string;
   /** 若传入则覆盖用户设置中的 agentMode */
   agentMode?: AgentMode;
+  /** true 时启用深度思考提示词策略 */
+  deepThink?: boolean;
 }
 
 export interface QueryHandlers {
@@ -52,6 +55,10 @@ export class QueryEngine {
       const settings = await this._loadSettings(uid);
       const conv = await loadConversation(uid, conversationId);
       const contextMessages = buildContextMessages(conv, content);
+      const runtimeMessages = applyDeepThinkPolicyPrompt(
+        contextMessages,
+        params.deepThink ?? false,
+      );
 
       const assistantMessages: ChatMessage[] = [];
       const wrappedOnToken = (cardType: CardType, token: string) => {
@@ -69,7 +76,6 @@ export class QueryEngine {
       };
 
       const fallbackMode = params.agentMode ?? settings.agentMode;
-
       // 意图解析：根据配置策略解析用户意图，再路由到最合适的 Runner
       const intentParser = new IntentParser(
         settings.intentDetection,
@@ -84,7 +90,7 @@ export class QueryEngine {
 
       await runner.execute(
         content,
-        contextMessages,
+        runtimeMessages,
         { onToken: wrappedOnToken, onDone, onError },
         signal,
       );

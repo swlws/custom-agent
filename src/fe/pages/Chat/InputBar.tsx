@@ -8,7 +8,7 @@ const MIN_ROWS = 1;
 const MAX_ROWS = 3;
 
 interface InputBarProps {
-  onSend: (value: string) => void;
+  onSend: (value: string, deepThink?: boolean) => void;
   onAbort: () => void;
   disabled: boolean;
   loading: boolean;
@@ -27,6 +27,7 @@ export const InputBar = memo(function InputBar({
   onModeChange,
 }: InputBarProps) {
   const [value, setValue] = useState("");
+  const [deepThink, setDeepThink] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // 每次内容变化时自适应高度，限制在 MIN_ROWS ~ MAX_ROWS 行
@@ -47,10 +48,10 @@ export const InputBar = memo(function InputBar({
   const handleSend = useCallback(() => {
     const trimmed = value.trim();
     if (trimmed) {
-      onSend(trimmed);
+      onSend(trimmed, deepThink);
       setValue("");
     }
-  }, [value, onSend]);
+  }, [value, onSend, deepThink]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
@@ -91,7 +92,17 @@ export const InputBar = memo(function InputBar({
             </div>
 
             {/* 右下角：发送 / 停止按钮 */}
-            <div>
+            <div className="flex items-center gap-3">
+              <label className="flex cursor-pointer items-center gap-1.5 text-xs text-gray-600 select-none dark:text-gray-300">
+                <input
+                  type="checkbox"
+                  checked={deepThink}
+                  onChange={(e) => setDeepThink(e.target.checked)}
+                  disabled={loading}
+                  className="h-3.5 w-3.5 accent-[#202123] dark:accent-white"
+                />
+                深度思考
+              </label>
               {loading ? (
                 <button
                   onClick={onAbort}

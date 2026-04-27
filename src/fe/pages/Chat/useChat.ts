@@ -27,6 +27,7 @@ const VALID_MODES = new Set<AgentMode>([
   "plan-and-solve",
   "react",
   "image-gen",
+  "reflection",
 ]);
 
 function loadAgentMode(): AgentMode {
@@ -142,7 +143,7 @@ export function useChat() {
   }, []);
 
   const sendText = useCallback(
-    (text: string) => {
+    (text: string, deepThink = false) => {
       if (!text || loading) return;
 
       setMessages((prev) => [...prev, { role: "user", content: text }]);
@@ -161,6 +162,7 @@ export function useChat() {
         conversationId: cid,
         content: text,
         agentMode,
+        deepThink,
         onToken: (cardType: CardType, token: string) => {
           setMessages((prev) => {
             const updated = [...prev];

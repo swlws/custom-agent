@@ -11,6 +11,7 @@ const VALID_MODES = new Set<AgentMode>([
 ]);
 
 function parseAgentMode(value: string | null): AgentMode | undefined {
+  if (!value) return undefined;
   if (value && VALID_MODES.has(value as AgentMode)) {
     return value as AgentMode;
   }
@@ -18,14 +19,22 @@ function parseAgentMode(value: string | null): AgentMode | undefined {
   throw new Error("Invalid Agent Mode");
 }
 
+function parseDeepThink(value: string | boolean | null | undefined): boolean {
+  if (typeof value === "boolean") return value;
+  if (!value) return false;
+  return value === "1" || value === "true";
+}
+
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
-  const { uid, conversationId, content, agentMode } = (await req.json()) as {
+  const { uid, conversationId, content, agentMode, deepThink } =
+    (await req.json()) as {
     uid?: string;
     conversationId?: string;
     content: string;
     agentMode?: string;
+    deepThink?: boolean | string;
   };
 
   if (!content?.trim()) {
@@ -37,6 +46,7 @@ export async function POST(req: NextRequest) {
     conversationId ?? "default",
     content,
     parseAgentMode(agentMode ?? null),
+    parseDeepThink(deepThink),
   );
 }
 
@@ -46,6 +56,7 @@ export async function GET(req: NextRequest) {
   const conversationId = url.searchParams.get("conversationId") ?? "default";
   const content = url.searchParams.get("content");
   const agentMode = url.searchParams.get("agentMode");
+  const deepThink = url.searchParams.get("deepThink");
 
   if (!content?.trim()) {
     return new Response("content is required", { status: 400 });
@@ -56,5 +67,6 @@ export async function GET(req: NextRequest) {
     conversationId,
     content,
     parseAgentMode(agentMode),
+    parseDeepThink(deepThink),
   );
 }
