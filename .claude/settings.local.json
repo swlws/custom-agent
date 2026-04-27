@@ -10,7 +10,8 @@
       "Bash(node *)",
       "Bash(npx tsc *)",
       "WebSearch",
-      "Bash(grep -E \"\\\\.\\(ts|tsx\\)$\")"
+      "Bash(grep -E \"\\\\.\\(ts|tsx\\)$\")",
+      "Skill(ask)"
     ]
   }
 }

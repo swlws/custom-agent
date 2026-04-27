@@ -23,3 +23,25 @@ export interface ModeRunner {
     signal?: AbortSignal,
   ): Promise<string>;
 }
+
+/* ── Reflection 专用类型 ── */
+
+/** Audit 阶段结构化输出 */
+export interface AuditIssue {
+  severity: "critical" | "minor";
+  description: string;
+  suggestion: string;
+}
+
+export interface AuditResult {
+  status: "pass" | "fail";
+  confidence: number;
+  issues: AuditIssue[];
+}
+
+/** Reflection 模式配置 */
+export interface ReflectionOptions {
+  maxRounds?: number;          // 默认 3
+  auditTemperature?: number;   // Audit 阶段低温 0.2
+  draftTemperature?: number;   // Draft 阶段 0.7
+}

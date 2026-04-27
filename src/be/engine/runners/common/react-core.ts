@@ -8,6 +8,8 @@ const TOKEN_BUDGET = 32_000;
 export interface ReActOptions {
   signal?: AbortSignal;
   temperature?: number;
+  /** 若为 true，直接操作传入的 messages 数组（不复制），用于 Reflection 共享上下文 */
+  mutable?: boolean;
 }
 
 export function createClient(): OpenAI {
@@ -24,20 +26,21 @@ export function resolveModel(): string {
 
 /**
  * 通用的 ReAct 核心循环逻辑
+ * 当 options.mutable 为 true 时，直接操作传入的 messages 数组（共享上下文场景）
  */
 export async function runReActLoop(
   initialMessages: OpenAI.Chat.ChatCompletionMessageParam[],
   onToken: (cardType: CardType, token: string) => void,
   options: ReActOptions = {},
 ): Promise<string> {
-  const { signal, temperature = 0.7 } = options;
+  const { signal, temperature = 0.7, mutable = false } = options;
   const client = createClient();
   const model = resolveModel();
   const toolDefinitions = getToolDefinitions();
 
   let fullReply = "";
   let usedTokens = 0;
-  const messages = [...initialMessages];
+  const messages = mutable ? initialMessages : [...initialMessages];
 
   while (usedTokens < TOKEN_BUDGET) {
     if (signal?.aborted) break;
@@ -110,6 +113,10 @@ export async function runReActLoop(
 
     // 无工具调用 → LLM 已给出最终答案
     if (toolCalls.length === 0) {
+      // 共享上下文场景：将最终 assistant 输出追加到 messages，供后续阶段引用
+      if (mutable && stepText) {
+        messages.push({ role: "assistant", content: stepText });
+      }
       break;
     }
 
