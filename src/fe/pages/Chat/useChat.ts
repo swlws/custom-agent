@@ -6,7 +6,6 @@ import {
 } from "@/fe/lib/chatSseClient";
 import {
   getUid,
-  getConversationId,
   createNewConversationId,
   setConversationId,
 } from "@/fe/lib/uid";
@@ -81,7 +80,7 @@ export function useChat() {
   const sseRef = useRef<{ close: () => void } | null>(null);
 
   useEffect(() => {
-    setConversationIdState(getConversationId());
+    setConversationIdState(createNewConversationId());
     setAgentModeState(loadAgentMode());
     return () => {
       sseRef.current?.close();

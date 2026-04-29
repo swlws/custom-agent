@@ -13,16 +13,6 @@ export function getUid(): string {
   return uid;
 }
 
-export function getConversationId(): string {
-  if (!isBrowser) return "";
-  let cid = localStorage.getItem(CONVERSATION_KEY);
-  if (!cid) {
-    cid = crypto.randomUUID();
-    localStorage.setItem(CONVERSATION_KEY, cid);
-  }
-  return cid;
-}
-
 export function createNewConversationId(): string {
   const cid = crypto.randomUUID();
   if (isBrowser) localStorage.setItem(CONVERSATION_KEY, cid);
