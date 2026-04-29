@@ -28,6 +28,7 @@ class McpManager {
         const adapted = client.tools.map((info) =>
           adaptMcpTool(serverName, info, client),
         );
+        console.log(adapted);
         this._tools.push(...adapted);
         console.log(
           `[MCP] ${serverName} connected, ${adapted.length} tool(s) loaded`,
