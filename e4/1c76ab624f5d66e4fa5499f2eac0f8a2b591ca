@@ -1,0 +1,14 @@
+src/be/config/paths.ts
+  h_9054b55ea37caa 18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "e41c76ab624f5d66e4fa5499f2eac0f8a2b591ca",
+  "prompts": {},
+  "humans": {
+    "h_9054b55ea37caa": {
+      "author": "swlws"
+    }
+  }
+}
