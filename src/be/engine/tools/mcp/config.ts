@@ -59,3 +59,7 @@ export async function loadMcpConfig(): Promise<McpConfig> {
     return { mcpServers: {} };
   }
 }
+
+export async function saveMcpConfig(config: McpConfig): Promise<void> {
+  await fs.writeFile(MCP_CONFIG_PATH, JSON.stringify(config, null, 2), "utf-8");
+}

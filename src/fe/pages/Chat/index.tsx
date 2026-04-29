@@ -6,6 +6,7 @@ import { MessageList } from "./MessageList";
 import { InputBar } from "./InputBar";
 import { ConversationList } from "./ConversationList";
 import { SettingsPanel } from "./SettingsPanel";
+import { McpPanel } from "./McpPanel";
 import { ChatHeader } from "./ChatHeader";
 
 export default function Chat() {
@@ -26,6 +27,7 @@ export default function Chat() {
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [mcpOpen, setMcpOpen] = useState(false);
 
   useEffect(() => {
     loadConversationList();
@@ -47,6 +49,7 @@ export default function Chat() {
         onNewChat={handleNewChat}
         onDeleteConversation={deleteConversation}
         onOpenSettings={() => setSettingsOpen(true)}
+        onOpenMcp={() => setMcpOpen(true)}
       />
 
       {/* 右侧主内容区 */}
@@ -75,6 +78,10 @@ export default function Chat() {
         isOpen={settingsOpen}
         onClose={() => setSettingsOpen(false)}
         onSave={() => {}}
+      />
+      <McpPanel
+        isOpen={mcpOpen}
+        onClose={() => setMcpOpen(false)}
       />
     </div>
   );
